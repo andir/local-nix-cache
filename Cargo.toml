@@ -1,0 +1,17 @@
+[package]
+name = "local-nix-cache"
+version = "0.1.0"
+authors = ["Andreas Rammhold <andreas@rammhold.de>"]
+edition = "2018"
+
+[dependencies]
+bzip2 = "0.3"
+clap = "2.33.0"
+actix-web = "1.0.0-beta.1"
+tempdir = "0.3.7"
+reqwest = "0.9.15"
+env_logger = "0.6.1"
+
+[dependencies.rusqlite]
+version = "0.17"
+features = [ "trace" ]

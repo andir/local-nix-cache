@@ -1,0 +1,39 @@
+CREATE TABLE BinaryCaches (
+            id        integer primary key autoincrement not null,
+            url       text unique not null,
+            timestamp integer not null,
+            storeDir  text not null,
+            wantMassQuery integer not null,
+            priority  integer not null
+        );
+CREATE TABLE NARs (
+            cache            integer not null,
+            storePath        text not null,
+            url              text not null,
+            compression      text not null,
+            fileHash         text,
+            fileSize         integer,
+            narHash          text,
+            narSize          integer,
+            refs             text,
+            deriver          text,
+            signedBy         text,
+            timestamp        integer not null,
+            primary key (cache, storePath),
+            foreign key (cache) references BinaryCaches(id) on delete cascade
+        );
+CREATE TABLE NARExistence (
+            cache            integer not null,
+            storePath        text not null,
+            exist            integer not null,
+            timestamp        integer not null,
+            primary key (cache, storePath),
+            foreign key (cache) references BinaryCaches(id) on delete cascade
+        );
+
+
+INSERT INTO BinaryCaches VALUES(1,'https://cache.nixos.org',1504379708,'/nix/store',1,40);
+
+
+INSERT INTO NARs VALUES(1,'fh7bfrad2xfwxhi7sl0xh1lpy2bipqmk-dmenu-4.6','nar/1vf2d2bjmhksvv2pf92mlm92nhf84qq3fadci0hj5h1pyaqd3c9k.nar.xz','xz','sha256:1vf2d2bjmhksvv2pf92mlm92nhf84qq3fadci0hj5h1pyaqd3c9k',15936,'sha256:1l3gk094fmlzs1mrms75qjv6k9xrp1lcblpn9r4w8xb1i158lds6',45328,'9i9xzcc2sgrsh3dm67aqqp5f2iglsgqn-libX11-1.6.5 ckblk0cicg105a3f2nsqa8mqb180zpcj-libXinerama-1.1.3 f2h42apcf1153mms31p8c188absl9ybj-libXft-2.3.2 fh7bfrad2xfwxhi7sl0xh1lpy2bipqmk-dmenu-4.6 kjwbqnh13dxh6w4pk2gb3ddmhpiaihqg-glibc-2.25 lpk84rsbha199vm3k54498lqv2jswqj8-bash-4.4-p5 zfi7r3i3ibk68kd2qddvrvfdmzx0bn7y-fontconfig-2.12.1-lib','1czawflhx9cz0aks05rw5iwbf1nqw998-dmenu-4.6.drv','cache.nixos.org-1',1504380924);
+
