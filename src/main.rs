@@ -1,5 +1,6 @@
 #[macro_use]
 extern crate rusqlite;
+extern crate libnixstore_sys;
 
 mod store;
 mod binary_cache;
@@ -47,6 +48,8 @@ impl NARInfo {
        write!(info, "Compression: {}\n", compression);
        write!(info, "NarHash: {}\n", self.nar_hash).unwrap();
        write!(info, "NarSize: {}\n", self.nar_size).unwrap();
+       write!(info, "FileHash: {}\n", self.file_hash).unwrap();
+       write!(info, "FileSize: {}\n", self.file_size).unwrap();
        write!(info, "References: {}\n", self.references).unwrap();
        write!(info, "Deriver: {}\n", self.deriver).unwrap();
        write!(info, "Sig: {}\n", self.sig).unwrap();
@@ -108,7 +111,6 @@ impl NARInfo {
 struct Data {
     dbfile: String,
     narinfo_cache: Arc<RwLock<HashMap<String, NARInfo>>>,
-    nar2narinfo: Arc<RwLock<HashMap<String, NARInfo>>>,
 }
 
 impl Data {
@@ -117,15 +119,8 @@ impl Data {
         Self {
             dbfile: dbfile.to_owned(),
             narinfo_cache: Arc::new(RwLock::new(HashMap::new())),
-            nar2narinfo: Arc::new(RwLock::new(HashMap::new()))
+            //nar2narinfo: Arc::new(RwLock::new(HashMap::new()))
         }
-    }
-
-    // FIXME: change return value to a Result<T> with a proper error kind..
-    fn open_binary_cache_db(&self) -> BinaryCacheDB {
-        let connection = rusqlite::Connection::open(self.dbfile.clone()).expect("Failed to open database. Does the use have write access (for the locks)?");
-        let cache = BinaryCacheDB::new_with_db(connection);
-        cache
     }
 
     fn open_store_db(&self) -> StoreDB {
@@ -157,13 +152,6 @@ impl Data {
             map.entry(path.as_ref().to_owned()).or_insert(narinfo.clone());
         }
 
-        {
-            let mapping = Arc::clone(&self.nar2narinfo);
-            let mut map = mapping.write().expect("RwLock poisoned");
-            map.entry(narinfo.url.clone()).or_insert(narinfo.clone());
-            println!("Inserted narinfo to nar2narinfo: {}", narinfo.url);
-        }
-
         Ok(narinfo)
     }
 }
@@ -172,62 +160,95 @@ fn serve(dbfile: &str, port: i16) -> std::io::Result<()> {
     use actix_web::{App, web, Responder, HttpServer, HttpResponse, middleware};
 
     fn nar(data: web::Data<Data>, info: web::Path<(String,)>) -> impl Responder {
-		let hash = info.0.to_owned();
-        let sdb = data.open_store_db();
+		let hash = format!("sha256:{}", info.0);
 
-        let narinfo = {
-            let key = format!("nar/{}.nar", info.0);
-            let mapping = data.nar2narinfo.clone();
-            let map = mapping.read().expect("RwLock poisoned");
-            let v = map.get(&key).cloned();
-            v
+        let mut instance = libnixstore_sys::Instance::new().unwrap();
+        let path = match instance.query_path_from_file_hash(&hash) {
+            Ok(Some(p)) => p,
+            Ok(None) | Err(_) => {
+                println!("No path for nar hash {} found or failed to query", &hash);
+                return HttpResponse::NotFound().finish();
+            }
         };
 
-        println!("narInfo: {:?} for {}", narinfo, info.0);
-        if let Some(narinfo) = narinfo {
-            use std::process::{Command, Stdio};
-            let out = Command::new("nix-store")
-                .arg("--export")
-                .arg(narinfo.store_path)
-                .output()
-                .expect("failed to execute dump");
+        let path_info = match instance.query_path_info(path) {
+            Ok(Some(pi)) => pi,
+            Ok(None) | Err(_) => return HttpResponse::NotFound().finish(),
+        };
 
-            return HttpResponse::Ok().content_type("text/plain").body(out.stdout);
-        }
+        // let narinfo = match data.retrieve_narinfo(&path_info.hash_part) {
+        //     Ok(n) => n,
+        //     Err(_) => {
+        //         println!("Failed to retrieve narinfo for nar file of path {}", &path_info.path);
+        //         return HttpResponse::NotFound().finish();
+        //     },
+        // };
 
-        return HttpResponse::NotFound().finish();
-    }
+        println!("path info: {:?} for {}", path_info, hash);
+        use std::process::{Command};
+        let out = Command::new("nix-store")
+            .arg("--dump")
+            .arg(path_info.path)
+            .output()
+            .expect("failed to execute dump");
+
+        return HttpResponse::Ok().content_type("application/x-nix-nar").body(out.stdout);
+       }
 
     fn narinfo(data: web::Data<Data>, info: web::Path<(String,)>) -> impl Responder {
         //let bdb = data.open_binary_cache_db();
-        let sdb = data.open_store_db();
+        //let sdb = data.open_store_db();
+        let mut instance = libnixstore_sys::Instance::new().unwrap();
 
-        match sdb.query_path_from_hash_part(info.0.to_owned()) {
-            Err(e) => return HttpResponse::NotFound().finish(),
-            Ok(None) => return HttpResponse::NotFound().finish(),
+
+        println!("narinfo for path: {}", &info.0);
+
+        match instance.query_path_from_hash_part(&info.0) {
+            Err(e) => {
+                println!("Failed to query for path from hash_part for {}", &info.0);
+                return HttpResponse::NotFound().finish();
+            },
+            Ok(None) => {
+                println!("No path for hash part {} found.", &info.0);
+                return HttpResponse::NotFound().finish();
+            },
             Ok(Some(path)) => {
-                match path.sigs {
-                    // very ugly way to deal with this.. If the local Nar cache would always be
-                    // there we could look it up there :/
-                    Some(ref sigs) if !sigs.is_empty() && sigs.starts_with("cache.nixos.org-1:")  => {
-
-                        let narinfo = data.retrieve_narinfo(&info.0);
-
-                        match narinfo {
-                            Ok(narinfo) => {
-                                let resp = narinfo.format_with_compression("none");
-                                return HttpResponse::Ok().content_type("text/x-nix-narinfo").body(resp);
-                            },
-                            Err(e) => {
-                                println!("Failed to retrieve NARInfo for path {}: {}", path.path, e);
-                                return HttpResponse::NotFound().finish();
-                            }
-                        }
-                    },
-                    _ => {
+                let path_info = match instance.query_path_info(&path) {
+                    Ok(Some(pi)) => pi,
+                    Ok(None) | Err(_) => {
+                        println!("Failed to query path info or no path info found for path: {}", path);
                         return HttpResponse::NotFound().finish();
-//                        return format!("Found but not giving it away since it lacks signatures! {:?}", path);
+                    },
+                };
+                let sigs = path_info.signatures;
+                // very ugly way to deal with this.. If the local Nar cache would always be
+                // there we could look it up there :/
+                if !sigs.is_empty() && sigs.starts_with("cache.nixos.org-1:") {
+
+
+                    let narinfo = data.retrieve_narinfo(&info.0);
+                    match narinfo {
+                        Ok(narinfo) => {
+                            match instance.query_path_from_file_hash(&narinfo.file_hash) {
+                                Ok(None) | Err(_) => {
+                                    println!("Path {} not cached locally", &path_info.path);
+                                    return HttpResponse::NotFound().finish();
+                                },
+                                Ok(Some(_)) => {},
+                            }
+
+                            let resp = narinfo.format_with_compression("none");
+                            return HttpResponse::Ok().content_type("text/x-nix-narinfo").body(resp);
+                        },
+                        Err(e) => {
+                            println!("Failed to retrieve NARInfo for path {}: {}", path, e);
+                            return HttpResponse::NotFound().finish();
+                        }
                     }
+                } else {
+                    println!("Path {} is not signed by cache.nixos.org", path);
+                    return HttpResponse::NotFound().finish();
+//                    return format!("Found but not giving it away since it lacks signatures! {:?}", path);
                 }
             },
         }
