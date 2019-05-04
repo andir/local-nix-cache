@@ -5,7 +5,30 @@ internet connections: Sharing binaries between different NixOS systems without
 requiring an extended amount of trust to the local peers.
 
 The primary idea is to re-serve the contents of the local Nix store in a format
-that is compatible with the signatures of cache.nixos.org.
+that is compatible with the signatures of cache.nixos.org. There is no
+additional trust setup required. As long you trust the signing key of hydra you
+can just use anyones NAR files.
+
+Ideally we could just use IPFS but we aren't quiet there yet.
+
+# Use cases
+
+**Note**: Not all of them a properly covered. Local discovery is pretty
+important to be really useful.
+
+In general all situations where internet bandwidth or volume is a concern. E.g.
+slow links, high latencies, metered connections, ….
+
+Some situations where this might come in handy are:
+
+- a bunch of machines with an overlapping set of packages
+  downloading the same files.
+
+- a group of Nix(OS) users sharing an internet connection that falls in one of
+  the previous categories. Conferences, Workshops, Co-worker in a shared office
+  space.
+
+  (Offline scenarios are not (yet) supported. Hopefully some day.)
 
 # Requirements
 
