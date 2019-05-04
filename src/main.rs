@@ -1,16 +1,8 @@
 #[macro_use]
-extern crate rusqlite;
 extern crate libnixstore_sys;
 
-mod store;
-mod binary_cache;
-
-pub use store::*;
-pub use binary_cache::*;
-
-use crate::binary_cache::BinaryCacheDB;
-use std::sync::{RwLock, Arc};
 use std::collections::HashMap;
+use std::sync::{Arc, RwLock};
 
 /*
   StorePath: /nix/store/8aijxqjfzwysvx4d4ydank0kax2z4mz2-systemd-239.20190219
@@ -41,26 +33,26 @@ pub struct NARInfo {
 
 impl NARInfo {
     fn format_with_compression(&self, compression: &str) -> String {
-       use std::fmt::Write;
-       let mut info = "".to_owned();
-       write!(info, "StorePath: {}\n", self.store_path).unwrap();
-       write!(info, "URL: {}\n", self.url).unwrap();
-       write!(info, "Compression: {}\n", compression);
-       write!(info, "NarHash: {}\n", self.nar_hash).unwrap();
-       write!(info, "NarSize: {}\n", self.nar_size).unwrap();
-       write!(info, "FileHash: {}\n", self.file_hash).unwrap();
-       write!(info, "FileSize: {}\n", self.file_size).unwrap();
-       write!(info, "References: {}\n", self.references).unwrap();
-       write!(info, "Deriver: {}\n", self.deriver).unwrap();
-       write!(info, "Sig: {}\n", self.sig).unwrap();
-       info
+        use std::fmt::Write;
+        let mut info = "".to_owned();
+        write!(info, "StorePath: {}\n", self.store_path).unwrap();
+        write!(info, "URL: {}\n", self.url).unwrap();
+        write!(info, "Compression: {}\n", compression);
+        write!(info, "NarHash: {}\n", self.nar_hash).unwrap();
+        write!(info, "NarSize: {}\n", self.nar_size).unwrap();
+        write!(info, "FileHash: {}\n", self.file_hash).unwrap();
+        write!(info, "FileSize: {}\n", self.file_size).unwrap();
+        write!(info, "References: {}\n", self.references).unwrap();
+        write!(info, "Deriver: {}\n", self.deriver).unwrap();
+        write!(info, "Sig: {}\n", self.sig).unwrap();
+        info
     }
 }
 
 impl std::string::ToString for NARInfo {
-   fn to_string(&self) -> String {
-       self.format_with_compression(&self.compression)
-   }
+    fn to_string(&self) -> String {
+        self.format_with_compression(&self.compression)
+    }
 }
 
 impl NARInfo {
@@ -71,7 +63,8 @@ impl NARInfo {
         let mut ni = Self::default();
 
         let parse_size = |v: String| {
-            v.parse().map_err(|_| format!("failed to parse value {} as isize", v))
+            v.parse()
+                .map_err(|_| format!("failed to parse value {} as isize", v))
         };
 
         for line in s.as_ref().lines() {
@@ -98,7 +91,8 @@ impl NARInfo {
 
         // FIXME: we are removing the compression behind the URL so we can just serve the files
         // without compression for now
-        ni.url = ni.url
+        ni.url = ni
+            .url
             .replace(".nar.xz", ".nar")
             .replace(".nar.gz", ".nar")
             .replace(".nar.bz2", ".nar");
@@ -109,33 +103,25 @@ impl NARInfo {
 
 #[derive(Clone)]
 struct Data {
-    dbfile: String,
     narinfo_cache: Arc<RwLock<HashMap<String, NARInfo>>>,
 }
 
 impl Data {
-
-    fn with_dbfile(dbfile: &str) -> Self {
+    fn new() -> Self {
         Self {
-            dbfile: dbfile.to_owned(),
             narinfo_cache: Arc::new(RwLock::new(HashMap::new())),
-            //nar2narinfo: Arc::new(RwLock::new(HashMap::new()))
         }
-    }
-
-    fn open_store_db(&self) -> StoreDB {
-        StoreDB::new().unwrap()
     }
 
     fn retrieve_narinfo<S: AsRef<str>>(&self, path: S) -> std::result::Result<NARInfo, String> {
         let cache = Arc::clone(&self.narinfo_cache);
 
-        let map = cache.read().expect("RwLock poisoned");
-
-        if let Some(narinfo) = map.get(path.as_ref()) {
-            return Ok(narinfo.clone());
+        {
+            let map = cache.read().expect("RwLock poisoned");
+            if let Some(narinfo) = map.get(path.as_ref()) {
+                return Ok(narinfo.clone());
+            }
         }
-        drop(map);
 
         let url = format!("https://cache.nixos.org/{}.narinfo", path.as_ref());
 
@@ -143,24 +129,26 @@ impl Data {
         // that is already running from actix
         let text = reqwest::get(&url)
             .map_err(|e| format!("Failed to request narinfo from binary cache: {}", e))?
-            .text().map_err(|e| format!("Failed to retrieve response from binary cache: {}", e))?;
+            .text()
+            .map_err(|e| format!("Failed to retrieve response from binary cache: {}", e))?;
 
         let narinfo = NARInfo::parse(text)?;
 
         {
             let mut map = cache.write().expect("RwLock poisoned");
-            map.entry(path.as_ref().to_owned()).or_insert(narinfo.clone());
+            map.entry(path.as_ref().to_owned())
+                .or_insert(narinfo.clone());
         }
 
         Ok(narinfo)
     }
 }
 
-fn serve(dbfile: &str, port: i16) -> std::io::Result<()> {
-    use actix_web::{App, web, Responder, HttpServer, HttpResponse, middleware};
+fn serve(port: i16) -> std::io::Result<()> {
+    use actix_web::{middleware, server, App, HttpResponse, Path, Responder, State};
 
-    fn nar(data: web::Data<Data>, info: web::Path<(String,)>) -> impl Responder {
-		let hash = format!("sha256:{}", info.0);
+    fn nar(data: State<Data>, info: Path<(String,)>) -> impl Responder {
+        let hash = format!("sha256:{}", info.0);
 
         let mut instance = libnixstore_sys::Instance::new().unwrap();
         let path = match instance.query_path_from_file_hash(&hash) {
@@ -185,21 +173,22 @@ fn serve(dbfile: &str, port: i16) -> std::io::Result<()> {
         // };
 
         println!("path info: {:?} for {}", path_info, hash);
-        use std::process::{Command};
+        use std::process::Command;
         let out = Command::new("nix-store")
             .arg("--dump")
             .arg(path_info.path)
             .output()
             .expect("failed to execute dump");
 
-        return HttpResponse::Ok().content_type("application/x-nix-nar").body(out.stdout);
-       }
+        return HttpResponse::Ok()
+            .content_type("application/x-nix-nar")
+            .body(out.stdout);
+    }
 
-    fn narinfo(data: web::Data<Data>, info: web::Path<(String,)>) -> impl Responder {
+    fn narinfo(data: State<Data>, info: Path<(String,)>) -> impl Responder {
         //let bdb = data.open_binary_cache_db();
         //let sdb = data.open_store_db();
         let mut instance = libnixstore_sys::Instance::new().unwrap();
-
 
         println!("narinfo for path: {}", &info.0);
 
@@ -207,25 +196,26 @@ fn serve(dbfile: &str, port: i16) -> std::io::Result<()> {
             Err(e) => {
                 println!("Failed to query for path from hash_part for {}", &info.0);
                 return HttpResponse::NotFound().finish();
-            },
+            }
             Ok(None) => {
                 println!("No path for hash part {} found.", &info.0);
                 return HttpResponse::NotFound().finish();
-            },
+            }
             Ok(Some(path)) => {
                 let path_info = match instance.query_path_info(&path) {
                     Ok(Some(pi)) => pi,
                     Ok(None) | Err(_) => {
-                        println!("Failed to query path info or no path info found for path: {}", path);
+                        println!(
+                            "Failed to query path info or no path info found for path: {}",
+                            path
+                        );
                         return HttpResponse::NotFound().finish();
-                    },
+                    }
                 };
                 let sigs = path_info.signatures;
                 // very ugly way to deal with this.. If the local Nar cache would always be
                 // there we could look it up there :/
                 if !sigs.is_empty() && sigs.starts_with("cache.nixos.org-1:") {
-
-
                     let narinfo = data.retrieve_narinfo(&info.0);
                     match narinfo {
                         Ok(narinfo) => {
@@ -233,13 +223,15 @@ fn serve(dbfile: &str, port: i16) -> std::io::Result<()> {
                                 Ok(None) | Err(_) => {
                                     println!("Path {} not cached locally", &path_info.path);
                                     return HttpResponse::NotFound().finish();
-                                },
-                                Ok(Some(_)) => {},
+                                }
+                                Ok(Some(_)) => {}
                             }
 
                             let resp = narinfo.format_with_compression("none");
-                            return HttpResponse::Ok().content_type("text/x-nix-narinfo").body(resp);
-                        },
+                            return HttpResponse::Ok()
+                                .content_type("text/x-nix-narinfo")
+                                .body(resp);
+                        }
                         Err(e) => {
                             println!("Failed to retrieve NARInfo for path {}: {}", path, e);
                             return HttpResponse::NotFound().finish();
@@ -248,57 +240,49 @@ fn serve(dbfile: &str, port: i16) -> std::io::Result<()> {
                 } else {
                     println!("Path {} is not signed by cache.nixos.org", path);
                     return HttpResponse::NotFound().finish();
-//                    return format!("Found but not giving it away since it lacks signatures! {:?}", path);
                 }
-            },
+            }
         }
     }
 
-    fn nix_cache_info() -> impl Responder {
+    fn nix_cache_info(_state: State<Data>) -> impl Responder {
         "StoreDir: /nix/store\nWantMassQuery: 1\nPriority: 30\n"
     }
 
-    let d = Data::with_dbfile(dbfile);
-            HttpServer::new(move || App::new()
-            .data(d.clone())
-            .wrap(middleware::Logger::default())
-            .route("/nar/{narHash}.nar", web::get().to(nar))
-            .route("/{narHash}.narinfo", web::get().to(narinfo))
-            .route("/nix-cache-info", web::get().to(nix_cache_info))
-            ).bind(format!("[::]:{}", port))?
-        .run()
-}
+    let d = Data::new();
+    server::new(move || {
+        App::with_state(d.clone())
+            .middleware(middleware::Logger::default())
+            .resource("/nar/{narHash}.nar", |r| r.get().with(nar))
+            .resource("/{narHash}.narinfo", |r| r.get().with(narinfo))
+            .resource("/nix-cache-info", |r| r.get().with(nix_cache_info))
+    })
+    .bind(format!("[::]:{}", port))?
+    .run();
 
+    Ok(())
+}
 
 fn main() {
     use clap::{App, Arg};
     env_logger::init();
 
     let matches = App::new("Nix-Local-Cache-Serve-Narinfo")
-                    .version("1.0")
-                    .author("Andreas Rammhold <andreas@rammhold.de>")
-                    .about("Serves narinfo files present in the local nix store. Only serves those files that were downloaded from the official hydra. No private builds should be leaked.")
-                    .arg(Arg::with_name("dbfile")
-                         .long("dbfile")
-                         .help("The sqlite database file that should be used to determine if the a NAR file exists on the local machine. FIXME: this isn't correct anymore.")
-                         .default_value("/nix/var/nix/db/db.sqlite"))
+                     .version("1.0")
+                     .author("Andreas Rammhold <andreas@rammhold.de>")
+                     .about("Serves narinfo files present in the local nix store. Only serves those files that were downloaded from the official hydra. No private builds should be leaked.")
                     .arg(Arg::with_name("port")
-                         .long("port")
-                         .help("The port to listen on for incoming HTTP connections.")
-                         .default_value("8380"))
-                    .get_matches();
+                    .long("port")
+                    .help("The port to listen on for incoming HTTP connections.")
+                    .default_value("8380"))
+                  .get_matches();
 
-    let dbfile = matches.value_of("dbfile").expect("Missing the database file name");
-    let port = matches.value_of("port")
+    let port = matches
+        .value_of("port")
         .expect("Missing the port to listen on.")
         .parse::<i16>()
         .expect("Invalid port (not numeric)");
-    println!("Got Database file: {}", dbfile);
-    println!("Got port: {}", port);
+    println!("Running on port: {}", port);
 
-
-    // let hash = "8aijxqjfzwysvx4d4ydank0kax2z4mz2";
-
-    let connection = rusqlite::Connection::open(dbfile).expect("Failed to open database. Does the use have write access (for the locks)?");
-    serve(dbfile, port).unwrap();
+    serve(port).unwrap();
 }
