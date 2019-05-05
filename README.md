@@ -11,6 +11,21 @@ can just use anyones NAR files.
 
 Ideally we could just use IPFS but we aren't quiet there yet.
 
+
+# How do I use this?
+
+0. Choose a machine to serve the cache from (called `server` from now on). It
+   is useful to use a machine with a larger set of paths in the store or a
+   machine that usually updates first.
+1. Install the `local-nix-cache` daemon via the module from the `module.nix`
+   (or your own) on the server.
+2. On all the machines that should make a use of the paths that might already
+   be present on the `server` add that machine to `nix.binaryCaches`.
+   e.g. `nix.binaryCaches = [ "http://titan:8083" "https://cache.nixos.org" ];`
+3. Run a build on a machine that isn't the server and you should see it
+   downloading all the paths that are alreayd downloaded to the server from
+   there. All the others will be retrieved from hydra as usual.
+
 # Use cases
 
 **Note**: Not all of them a properly covered. Local discovery is pretty
