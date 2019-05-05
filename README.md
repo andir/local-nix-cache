@@ -20,8 +20,8 @@ Ideally we could just use IPFS but we aren't quiet there yet.
 1. Install the `local-nix-cache` daemon via the module from the `module.nix`
    (or your own) on the server.
 2. On all the machines that should make a use of the paths that might already
-   be present on the `server` add that machine to `nix.binaryCaches`.
-   e.g. `nix.binaryCaches = [ "http://titan:8083" "https://cache.nixos.org" ];`
+   be present on the `server` add the server to `nix.binaryCaches`.
+   e.g. `nix.binaryCaches = [ "http://server:8083" "https://cache.nixos.org" ];`
 3. Run a build on a machine that isn't the server and you should see it
    downloading all the paths that are alreayd downloaded to the server from
    there. All the others will be retrieved from hydra as usual.
