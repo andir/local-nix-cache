@@ -4,8 +4,8 @@ let
   libnixstore-c = pkgs.callPackage (pkgs.fetchFromGitHub {
     owner = "andir";
     repo = "libnixstore-c";
-    rev = "2ce29c26a4bca55bb5b83fa97f045659675bcfa7";
-    sha256 = "1jk798ck2ppkkw9i1p07rqk0xsi9bv89a62idwmzgxw6lniipby0";
+    rev = "fa0bb095033cff87e30b9ed6a1e659fa248b867e";
+    sha256 = "042afj357j2bq9y0nlcx1ps8g32yg00j4y9fn6fcvd70zrcsv4dk";
   }) {};
 
   cratesIO = pkgs.callPackage ./crates-io.nix {};
@@ -34,10 +34,11 @@ let
 #      extraLinkFlags = [ "-L${pkgs.bzip2}/lib" "-lbz2"];
     };
   });
-
 in {
-  inherit crates;
-#  crates = pkgs.lib.mapAttrs (n: v: v.override { inherit crateOverrides; }) crates;
+  # Since I require a patch to the nix-daemon provide a compatible nix package
+  inherit (libnixstore-c) nix;
+  path = ./.;
+
   pkg = (crates.local_nix_cache {}).override {
     inherit crateOverrides;
   };
@@ -52,6 +53,5 @@ in {
     shellHook = ''
     export LIBCLANG_PATH=${pkgs.llvmPackages.clang-unwrapped.lib}/lib
     '';
-
   };
 }
