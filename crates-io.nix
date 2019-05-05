@@ -2267,44 +2267,6 @@ rec {
 
 
 # end
-# fallible-iterator-0.1.6
-
-  crates.fallible_iterator."0.1.6" = deps: { features?(features_.fallible_iterator."0.1.6" deps {}) }: buildRustCrate {
-    crateName = "fallible-iterator";
-    version = "0.1.6";
-    description = "Fallible iterator traits";
-    authors = [ "Steven Fackler <sfackler@gmail.com>" ];
-    sha256 = "05fkfql4i0n93mz43k157xvkw1sjxahnkq9z8amzpv7y5r4w9bzj";
-    features = mkFeatures (features."fallible_iterator"."0.1.6" or {});
-  };
-  features_.fallible_iterator."0.1.6" = deps: f: updateFeatures f (rec {
-    fallible_iterator = fold recursiveUpdate {} [
-      { "0.1.6"."std" =
-        (f.fallible_iterator."0.1.6"."std" or false) ||
-        (f.fallible_iterator."0.1.6".default or false) ||
-        (fallible_iterator."0.1.6"."default" or false); }
-      { "0.1.6".default = (f.fallible_iterator."0.1.6".default or true); }
-    ];
-  }) [];
-
-
-# end
-# fallible-streaming-iterator-0.1.9
-
-  crates.fallible_streaming_iterator."0.1.9" = deps: { features?(features_.fallible_streaming_iterator."0.1.9" deps {}) }: buildRustCrate {
-    crateName = "fallible-streaming-iterator";
-    version = "0.1.9";
-    description = "Fallible streaming iteration";
-    authors = [ "Steven Fackler <sfackler@gmail.com>" ];
-    sha256 = "0yhqqhqf22vy8x22drkn045d65d6n6m2nxchdph8ixvp1fshx8s4";
-    features = mkFeatures (features."fallible_streaming_iterator"."0.1.9" or {});
-  };
-  features_.fallible_streaming_iterator."0.1.9" = deps: f: updateFeatures f (rec {
-    fallible_streaming_iterator."0.1.9".default = (f.fallible_streaming_iterator."0.1.9".default or true);
-  }) [];
-
-
-# end
 # flate2-1.0.7
 
   crates.flate2."1.0.7" = deps: { features?(features_.flate2."1.0.7" deps {}) }: buildRustCrate {
@@ -3177,71 +3139,32 @@ rec {
 
 
 # end
-# libsqlite3-sys-0.13.0
+# libnixstore-sys-0.1.0
 
-  crates.libsqlite3_sys."0.13.0" = deps: { features?(features_.libsqlite3_sys."0.13.0" deps {}) }: buildRustCrate {
-    crateName = "libsqlite3-sys";
-    version = "0.13.0";
-    description = "Native bindings to the libsqlite3 library";
-    authors = [ "John Gallagher <jgallagher@bignerdranch.com>" ];
+  crates.libnixstore_sys."0.1.0" = deps: { features?(features_.libnixstore_sys."0.1.0" deps {}) }: buildRustCrate {
+    crateName = "libnixstore-sys";
+    version = "0.1.0";
+    description = "Bindings to libnixstore-c";
+    authors = [ "Andreas Rammhold <andreas@rammhold.de>" ];
     edition = "2018";
-    sha256 = "10isz595lgrz30l8fdldb545r19bc88m86biycx58drzavh2d909";
-    build = "build.rs";
-    dependencies = (if abi == "msvc" then mapFeatures features ([
-]) else []);
+    sha256 = "0ich6hap5rg1whpk7gglbhm3iqdw9g60g3pksrai6img88s6v02g";
+    libPath = "src/lib.rs";
+    libName = "libnixstore_sys";
+    crateBin =
+      [{  name = "query_path_info";  path = "src/bin.rs"; }];
 
     buildDependencies = mapFeatures features ([
-    ]
-      ++ (if features.libsqlite3_sys."0.13.0".pkg-config or false then [ (crates.pkg_config."${deps."libsqlite3_sys"."0.13.0".pkg_config}" deps) ] else []));
-    features = mkFeatures (features."libsqlite3_sys"."0.13.0" or {});
+      (crates."bindgen"."${deps."libnixstore_sys"."0.1.0"."bindgen"}" deps)
+      (crates."pkg_config"."${deps."libnixstore_sys"."0.1.0"."pkg_config"}" deps)
+    ]);
   };
-  features_.libsqlite3_sys."0.13.0" = deps: f: updateFeatures f (rec {
-    libsqlite3_sys = fold recursiveUpdate {} [
-      { "0.13.0"."bindgen" =
-        (f.libsqlite3_sys."0.13.0"."bindgen" or false) ||
-        (f.libsqlite3_sys."0.13.0".buildtime_bindgen or false) ||
-        (libsqlite3_sys."0.13.0"."buildtime_bindgen" or false); }
-      { "0.13.0"."cc" =
-        (f.libsqlite3_sys."0.13.0"."cc" or false) ||
-        (f.libsqlite3_sys."0.13.0".bundled or false) ||
-        (libsqlite3_sys."0.13.0"."bundled" or false); }
-      { "0.13.0"."min_sqlite_version_3_6_8" =
-        (f.libsqlite3_sys."0.13.0"."min_sqlite_version_3_6_8" or false) ||
-        (f.libsqlite3_sys."0.13.0".default or false) ||
-        (libsqlite3_sys."0.13.0"."default" or false); }
-      { "0.13.0"."pkg-config" =
-        (f.libsqlite3_sys."0.13.0"."pkg-config" or false) ||
-        (f.libsqlite3_sys."0.13.0".buildtime_bindgen or false) ||
-        (libsqlite3_sys."0.13.0"."buildtime_bindgen" or false) ||
-        (f.libsqlite3_sys."0.13.0".min_sqlite_version_3_6_23 or false) ||
-        (libsqlite3_sys."0.13.0"."min_sqlite_version_3_6_23" or false) ||
-        (f.libsqlite3_sys."0.13.0".min_sqlite_version_3_6_8 or false) ||
-        (libsqlite3_sys."0.13.0"."min_sqlite_version_3_6_8" or false) ||
-        (f.libsqlite3_sys."0.13.0".min_sqlite_version_3_7_16 or false) ||
-        (libsqlite3_sys."0.13.0"."min_sqlite_version_3_7_16" or false) ||
-        (f.libsqlite3_sys."0.13.0".min_sqlite_version_3_7_7 or false) ||
-        (libsqlite3_sys."0.13.0"."min_sqlite_version_3_7_7" or false); }
-      { "0.13.0"."preupdate_hook" =
-        (f.libsqlite3_sys."0.13.0"."preupdate_hook" or false) ||
-        (f.libsqlite3_sys."0.13.0".session or false) ||
-        (libsqlite3_sys."0.13.0"."session" or false); }
-      { "0.13.0"."vcpkg" =
-        (f.libsqlite3_sys."0.13.0"."vcpkg" or false) ||
-        (f.libsqlite3_sys."0.13.0".buildtime_bindgen or false) ||
-        (libsqlite3_sys."0.13.0"."buildtime_bindgen" or false) ||
-        (f.libsqlite3_sys."0.13.0".min_sqlite_version_3_6_23 or false) ||
-        (libsqlite3_sys."0.13.0"."min_sqlite_version_3_6_23" or false) ||
-        (f.libsqlite3_sys."0.13.0".min_sqlite_version_3_6_8 or false) ||
-        (libsqlite3_sys."0.13.0"."min_sqlite_version_3_6_8" or false) ||
-        (f.libsqlite3_sys."0.13.0".min_sqlite_version_3_7_16 or false) ||
-        (libsqlite3_sys."0.13.0"."min_sqlite_version_3_7_16" or false) ||
-        (f.libsqlite3_sys."0.13.0".min_sqlite_version_3_7_7 or false) ||
-        (libsqlite3_sys."0.13.0"."min_sqlite_version_3_7_7" or false); }
-      { "0.13.0".default = (f.libsqlite3_sys."0.13.0".default or true); }
-    ];
-    pkg_config."${deps.libsqlite3_sys."0.13.0".pkg_config}".default = true;
+  features_.libnixstore_sys."0.1.0" = deps: f: updateFeatures f (rec {
+    bindgen."${deps.libnixstore_sys."0.1.0".bindgen}".default = true;
+    libnixstore_sys."0.1.0".default = (f.libnixstore_sys."0.1.0".default or true);
+    pkg_config."${deps.libnixstore_sys."0.1.0".pkg_config}".default = true;
   }) [
-    (features_.pkg_config."${deps."libsqlite3_sys"."0.13.0"."pkg_config"}" deps)
+    (features_.bindgen."${deps."libnixstore_sys"."0.1.0"."bindgen"}" deps)
+    (features_.pkg_config."${deps."libnixstore_sys"."0.1.0"."pkg_config"}" deps)
   ];
 
 
@@ -5516,109 +5439,6 @@ rec {
     (features_.cc."${deps."ring"."0.13.5"."cc"}" deps)
     (features_.lazy_static."${deps."ring"."0.13.5"."lazy_static"}" deps)
     (features_.libc."${deps."ring"."0.13.5"."libc"}" deps)
-  ];
-
-
-# end
-# rusqlite-0.17.0
-
-  crates.rusqlite."0.17.0" = deps: { features?(features_.rusqlite."0.17.0" deps {}) }: buildRustCrate {
-    crateName = "rusqlite";
-    version = "0.17.0";
-    description = "Ergonomic wrapper for SQLite";
-    authors = [ "John Gallagher <jgallagher@bignerdranch.com>" ];
-    edition = "2018";
-    sha256 = "01kwdn8dvarf87cwxilkak4ypm9yh2kpdg94gir6cgr2m4vq8dgd";
-    dependencies = mapFeatures features ([
-      (crates."bitflags"."${deps."rusqlite"."0.17.0"."bitflags"}" deps)
-      (crates."fallible_iterator"."${deps."rusqlite"."0.17.0"."fallible_iterator"}" deps)
-      (crates."fallible_streaming_iterator"."${deps."rusqlite"."0.17.0"."fallible_streaming_iterator"}" deps)
-      (crates."libsqlite3_sys"."${deps."rusqlite"."0.17.0"."libsqlite3_sys"}" deps)
-      (crates."lru_cache"."${deps."rusqlite"."0.17.0"."lru_cache"}" deps)
-      (crates."memchr"."${deps."rusqlite"."0.17.0"."memchr"}" deps)
-      (crates."time"."${deps."rusqlite"."0.17.0"."time"}" deps)
-    ]);
-    features = mkFeatures (features."rusqlite"."0.17.0" or {});
-  };
-  features_.rusqlite."0.17.0" = deps: f: updateFeatures f (rec {
-    bitflags."${deps.rusqlite."0.17.0".bitflags}".default = true;
-    fallible_iterator."${deps.rusqlite."0.17.0".fallible_iterator}".default = true;
-    fallible_streaming_iterator."${deps.rusqlite."0.17.0".fallible_streaming_iterator}".default = true;
-    libsqlite3_sys = fold recursiveUpdate {} [
-      { "${deps.rusqlite."0.17.0".libsqlite3_sys}"."buildtime_bindgen" =
-        (f.libsqlite3_sys."${deps.rusqlite."0.17.0".libsqlite3_sys}"."buildtime_bindgen" or false) ||
-        (rusqlite."0.17.0"."buildtime_bindgen" or false) ||
-        (f."rusqlite"."0.17.0"."buildtime_bindgen" or false); }
-      { "${deps.rusqlite."0.17.0".libsqlite3_sys}"."bundled" =
-        (f.libsqlite3_sys."${deps.rusqlite."0.17.0".libsqlite3_sys}"."bundled" or false) ||
-        (rusqlite."0.17.0"."bundled" or false) ||
-        (f."rusqlite"."0.17.0"."bundled" or false); }
-      { "${deps.rusqlite."0.17.0".libsqlite3_sys}"."min_sqlite_version_3_6_23" =
-        (f.libsqlite3_sys."${deps.rusqlite."0.17.0".libsqlite3_sys}"."min_sqlite_version_3_6_23" or false) ||
-        (rusqlite."0.17.0"."backup" or false) ||
-        (f."rusqlite"."0.17.0"."backup" or false) ||
-        (rusqlite."0.17.0"."trace" or false) ||
-        (f."rusqlite"."0.17.0"."trace" or false); }
-      { "${deps.rusqlite."0.17.0".libsqlite3_sys}"."min_sqlite_version_3_7_7" =
-        (f.libsqlite3_sys."${deps.rusqlite."0.17.0".libsqlite3_sys}"."min_sqlite_version_3_7_7" or false) ||
-        (rusqlite."0.17.0"."blob" or false) ||
-        (f."rusqlite"."0.17.0"."blob" or false) ||
-        (rusqlite."0.17.0"."functions" or false) ||
-        (f."rusqlite"."0.17.0"."functions" or false) ||
-        (rusqlite."0.17.0"."vtab" or false) ||
-        (f."rusqlite"."0.17.0"."vtab" or false); }
-      { "${deps.rusqlite."0.17.0".libsqlite3_sys}"."session" =
-        (f.libsqlite3_sys."${deps.rusqlite."0.17.0".libsqlite3_sys}"."session" or false) ||
-        (rusqlite."0.17.0"."session" or false) ||
-        (f."rusqlite"."0.17.0"."session" or false); }
-      { "${deps.rusqlite."0.17.0".libsqlite3_sys}"."sqlcipher" =
-        (f.libsqlite3_sys."${deps.rusqlite."0.17.0".libsqlite3_sys}"."sqlcipher" or false) ||
-        (rusqlite."0.17.0"."sqlcipher" or false) ||
-        (f."rusqlite"."0.17.0"."sqlcipher" or false); }
-      { "${deps.rusqlite."0.17.0".libsqlite3_sys}"."unlock_notify" =
-        (f.libsqlite3_sys."${deps.rusqlite."0.17.0".libsqlite3_sys}"."unlock_notify" or false) ||
-        (rusqlite."0.17.0"."unlock_notify" or false) ||
-        (f."rusqlite"."0.17.0"."unlock_notify" or false); }
-      { "${deps.rusqlite."0.17.0".libsqlite3_sys}".default = true; }
-    ];
-    lru_cache."${deps.rusqlite."0.17.0".lru_cache}".default = true;
-    memchr."${deps.rusqlite."0.17.0".memchr}".default = true;
-    rusqlite = fold recursiveUpdate {} [
-      { "0.17.0"."byteorder" =
-        (f.rusqlite."0.17.0"."byteorder" or false) ||
-        (f.rusqlite."0.17.0".i128_blob or false) ||
-        (rusqlite."0.17.0"."i128_blob" or false); }
-      { "0.17.0"."csv" =
-        (f.rusqlite."0.17.0"."csv" or false) ||
-        (f.rusqlite."0.17.0".csvtab or false) ||
-        (rusqlite."0.17.0"."csvtab" or false); }
-      { "0.17.0"."hooks" =
-        (f.rusqlite."0.17.0"."hooks" or false) ||
-        (f.rusqlite."0.17.0".session or false) ||
-        (rusqlite."0.17.0"."session" or false); }
-      { "0.17.0"."lazy_static" =
-        (f.rusqlite."0.17.0"."lazy_static" or false) ||
-        (f.rusqlite."0.17.0".vtab or false) ||
-        (rusqlite."0.17.0"."vtab" or false); }
-      { "0.17.0"."vtab" =
-        (f.rusqlite."0.17.0"."vtab" or false) ||
-        (f.rusqlite."0.17.0".array or false) ||
-        (rusqlite."0.17.0"."array" or false) ||
-        (f.rusqlite."0.17.0".csvtab or false) ||
-        (rusqlite."0.17.0"."csvtab" or false) ||
-        (f.rusqlite."0.17.0".vtab_v3 or false) ||
-        (rusqlite."0.17.0"."vtab_v3" or false); }
-      { "0.17.0".default = (f.rusqlite."0.17.0".default or true); }
-    ];
-    time."${deps.rusqlite."0.17.0".time}".default = true;
-  }) [
-    (features_.bitflags."${deps."rusqlite"."0.17.0"."bitflags"}" deps)
-    (features_.fallible_iterator."${deps."rusqlite"."0.17.0"."fallible_iterator"}" deps)
-    (features_.fallible_streaming_iterator."${deps."rusqlite"."0.17.0"."fallible_streaming_iterator"}" deps)
-    (features_.libsqlite3_sys."${deps."rusqlite"."0.17.0"."libsqlite3_sys"}" deps)
-    (features_.lru_cache."${deps."rusqlite"."0.17.0"."lru_cache"}" deps)
-    (features_.memchr."${deps."rusqlite"."0.17.0"."memchr"}" deps)
-    (features_.time."${deps."rusqlite"."0.17.0"."time"}" deps)
   ];
 
 

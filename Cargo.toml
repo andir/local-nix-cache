@@ -14,4 +14,5 @@ env_logger = "0.6.1"
 version = "0.7"
 
 [dependencies.libnixstore-sys]
-path = "../libnixstore-sys"
+version = "0.1.0"
+# path = "../libnixstore-sys"

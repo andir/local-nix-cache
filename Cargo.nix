@@ -6,35 +6,6 @@ let inherit (lib.lists) fold;
 in
 rec {
   crates = cratesIO // rec {
-# libnixstore-sys-0.1.0
-
-    crates.libnixstore_sys."0.1.0" = deps: { features?(features_.libnixstore_sys."0.1.0" deps {}) }: buildRustCrate {
-      crateName = "libnixstore-sys";
-      version = "0.1.0";
-      authors = [ "Andreas Rammhold <andreas@rammhold.de>" ];
-      edition = "2018";
-      src = exclude [ ".git" "target" ] /home/andi/dev/private/local-nix-cache/../libnixstore-sys;
-      libPath = "src/lib.rs";
-      libName = "libnixstore_sys";
-      crateBin =
-        [{  name = "query_path_info";  path = "src/bin.rs"; }];
-
-      buildDependencies = mapFeatures features ([
-        (cratesIO.crates."bindgen"."${deps."libnixstore_sys"."0.1.0"."bindgen"}" deps)
-        (cratesIO.crates."pkg_config"."${deps."libnixstore_sys"."0.1.0"."pkg_config"}" deps)
-      ]);
-    };
-    features_.libnixstore_sys."0.1.0" = deps: f: updateFeatures f (rec {
-      bindgen."${deps.libnixstore_sys."0.1.0".bindgen}".default = true;
-      libnixstore_sys."0.1.0".default = (f.libnixstore_sys."0.1.0".default or true);
-      pkg_config."${deps.libnixstore_sys."0.1.0".pkg_config}".default = true;
-    }) [
-      (cratesIO.features_.bindgen."${deps."libnixstore_sys"."0.1.0"."bindgen"}" deps)
-      (cratesIO.features_.pkg_config."${deps."libnixstore_sys"."0.1.0"."pkg_config"}" deps)
-    ];
-
-
-# end
 # local-nix-cache-0.1.0
 
     crates.local_nix_cache."0.1.0" = deps: { features?(features_.local_nix_cache."0.1.0" deps {}) }: buildRustCrate {
@@ -47,9 +18,8 @@ rec {
         (cratesIO.crates."actix_web"."${deps."local_nix_cache"."0.1.0"."actix_web"}" deps)
         (cratesIO.crates."clap"."${deps."local_nix_cache"."0.1.0"."clap"}" deps)
         (cratesIO.crates."env_logger"."${deps."local_nix_cache"."0.1.0"."env_logger"}" deps)
-        (crates."libnixstore_sys"."${deps."local_nix_cache"."0.1.0"."libnixstore_sys"}" deps)
+        (cratesIO.crates."libnixstore_sys"."${deps."local_nix_cache"."0.1.0"."libnixstore_sys"}" deps)
         (cratesIO.crates."reqwest"."${deps."local_nix_cache"."0.1.0"."reqwest"}" deps)
-        (cratesIO.crates."rusqlite"."${deps."local_nix_cache"."0.1.0"."rusqlite"}" deps)
         (cratesIO.crates."tempdir"."${deps."local_nix_cache"."0.1.0"."tempdir"}" deps)
       ]);
     };
@@ -60,18 +30,13 @@ rec {
       libnixstore_sys."${deps.local_nix_cache."0.1.0".libnixstore_sys}".default = true;
       local_nix_cache."0.1.0".default = (f.local_nix_cache."0.1.0".default or true);
       reqwest."${deps.local_nix_cache."0.1.0".reqwest}".default = true;
-      rusqlite = fold recursiveUpdate {} [
-        { "${deps.local_nix_cache."0.1.0".rusqlite}"."trace" = true; }
-        { "${deps.local_nix_cache."0.1.0".rusqlite}".default = true; }
-      ];
       tempdir."${deps.local_nix_cache."0.1.0".tempdir}".default = true;
     }) [
       (cratesIO.features_.actix_web."${deps."local_nix_cache"."0.1.0"."actix_web"}" deps)
       (cratesIO.features_.clap."${deps."local_nix_cache"."0.1.0"."clap"}" deps)
       (cratesIO.features_.env_logger."${deps."local_nix_cache"."0.1.0"."env_logger"}" deps)
-      (features_.libnixstore_sys."${deps."local_nix_cache"."0.1.0"."libnixstore_sys"}" deps)
+      (cratesIO.features_.libnixstore_sys."${deps."local_nix_cache"."0.1.0"."libnixstore_sys"}" deps)
       (cratesIO.features_.reqwest."${deps."local_nix_cache"."0.1.0"."reqwest"}" deps)
-      (cratesIO.features_.rusqlite."${deps."local_nix_cache"."0.1.0"."rusqlite"}" deps)
       (cratesIO.features_.tempdir."${deps."local_nix_cache"."0.1.0"."tempdir"}" deps)
     ];
 
@@ -376,8 +341,6 @@ rec {
     syn = "0.15.33";
     synstructure = "0.10.1";
   };
-  deps.fallible_iterator."0.1.6" = {};
-  deps.fallible_streaming_iterator."0.1.9" = {};
   deps.flate2."1.0.7" = {
     crc32fast = "1.2.0";
     libc = "0.2.54";
@@ -489,9 +452,6 @@ rec {
     bindgen = "0.42.3";
     pkg_config = "0.3.14";
   };
-  deps.libsqlite3_sys."0.13.0" = {
-    pkg_config = "0.3.14";
-  };
   deps.linked_hash_map."0.5.2" = {};
   deps.local_nix_cache."0.1.0" = {
     actix_web = "0.7.19";
@@ -499,7 +459,6 @@ rec {
     env_logger = "0.6.1";
     libnixstore_sys = "0.1.0";
     reqwest = "0.9.16";
-    rusqlite = "0.17.0";
     tempdir = "0.3.7";
   };
   deps.lock_api."0.1.5" = {
@@ -771,15 +730,6 @@ rec {
     cc = "1.0.36";
     lazy_static = "1.3.0";
     libc = "0.2.54";
-  };
-  deps.rusqlite."0.17.0" = {
-    bitflags = "1.0.5";
-    fallible_iterator = "0.1.6";
-    fallible_streaming_iterator = "0.1.9";
-    libsqlite3_sys = "0.13.0";
-    lru_cache = "0.1.2";
-    memchr = "2.2.0";
-    time = "0.1.42";
   };
   deps.rustc_demangle."0.1.14" = {};
   deps.rustc_version."0.2.3" = {
