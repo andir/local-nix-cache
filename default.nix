@@ -29,8 +29,13 @@ let
       EXTRA_INCLUDE = "${pkgs.stdenv.cc.libc_dev}/include";
     };
 
+    multicast_dns = attrs: {
+      nativeBuildInputs = [ pkgs.pkgconfig ];
+      buildInputs = [ pkgs.avahi pkgs.dbus ];
+    };
+
     local-nix-cache = attrs: {
-      buildInputs = [ libnixstore-c ];
+      buildInputs = [ libnixstore-c pkgs.avahi pkgs.dbus ];
 #      extraLinkFlags = [ "-L${pkgs.bzip2}/lib" "-lbz2"];
     };
   });
@@ -49,6 +54,9 @@ in {
       openssl
       pkgconfig
       libnixstore-c
+      avahi
+      dbus
+      nix-prefetch-git
     ];
     shellHook = ''
     export LIBCLANG_PATH=${pkgs.llvmPackages.clang-unwrapped.lib}/lib

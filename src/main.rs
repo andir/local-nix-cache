@@ -1,3 +1,4 @@
+extern crate multicast_dns;
 #[macro_use]
 extern crate libnixstore_sys;
 
@@ -146,6 +147,9 @@ impl Data {
 
 fn serve(port: i16) -> std::io::Result<()> {
     use actix_web::{middleware, server, App, HttpResponse, Path, Responder, State};
+    use multicast_dns::host::HostManager as AvahiHostManager;
+    let host_manager = AvahiHostManager::new();
+    host_manager.announce_service("My local nix cache", "_nixcache._tcp", port as u16).unwrap();
 
     fn nar(data: State<Data>, info: Path<(String,)>) -> impl Responder {
         let hash = format!("sha256:{}", info.0);

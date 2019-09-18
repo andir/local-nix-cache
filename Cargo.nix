@@ -19,6 +19,7 @@ rec {
         (cratesIO.crates."clap"."${deps."local_nix_cache"."0.1.0"."clap"}" deps)
         (cratesIO.crates."env_logger"."${deps."local_nix_cache"."0.1.0"."env_logger"}" deps)
         (cratesIO.crates."libnixstore_sys"."${deps."local_nix_cache"."0.1.0"."libnixstore_sys"}" deps)
+        (crates."multicast_dns"."${deps."local_nix_cache"."0.1.0"."multicast_dns"}" deps)
         (cratesIO.crates."reqwest"."${deps."local_nix_cache"."0.1.0"."reqwest"}" deps)
         (cratesIO.crates."tempdir"."${deps."local_nix_cache"."0.1.0"."tempdir"}" deps)
       ]);
@@ -29,6 +30,7 @@ rec {
       env_logger."${deps.local_nix_cache."0.1.0".env_logger}".default = true;
       libnixstore_sys."${deps.local_nix_cache."0.1.0".libnixstore_sys}".default = true;
       local_nix_cache."0.1.0".default = (f.local_nix_cache."0.1.0".default or true);
+      multicast_dns."${deps.local_nix_cache."0.1.0".multicast_dns}".default = true;
       reqwest."${deps.local_nix_cache."0.1.0".reqwest}".default = true;
       tempdir."${deps.local_nix_cache."0.1.0".tempdir}".default = true;
     }) [
@@ -36,8 +38,38 @@ rec {
       (cratesIO.features_.clap."${deps."local_nix_cache"."0.1.0"."clap"}" deps)
       (cratesIO.features_.env_logger."${deps."local_nix_cache"."0.1.0"."env_logger"}" deps)
       (cratesIO.features_.libnixstore_sys."${deps."local_nix_cache"."0.1.0"."libnixstore_sys"}" deps)
+      (features_.multicast_dns."${deps."local_nix_cache"."0.1.0"."multicast_dns"}" deps)
       (cratesIO.features_.reqwest."${deps."local_nix_cache"."0.1.0"."reqwest"}" deps)
       (cratesIO.features_.tempdir."${deps."local_nix_cache"."0.1.0"."tempdir"}" deps)
+    ];
+
+
+# end
+# multicast_dns-0.4.2
+
+    crates.multicast_dns."0.4.2" = deps: { features?(features_.multicast_dns."0.4.2" deps {}) }: buildRustCrate {
+      crateName = "multicast_dns";
+      version = "0.4.2";
+      description = "Simple Rust wrapper around Avahi Daemon";
+      authors = [ "Aleh Zasypkin <aleh.zasypkin@gmail.com>" ];
+      src = fetchgit {
+         url = "https://github.com/andir/multicast-dns";
+         rev = "55d5ade735641a46ee4ce749698a35a6f29cd093";
+         sha256 = "1l4arq3qiwxrsp1930iqq9x7vfgfcv53s9ji0l1902z1yqz83qsa";
+         fetchSubmodules = false;
+      };
+      dependencies = mapFeatures features ([
+        (cratesIO.crates."libc"."${deps."multicast_dns"."0.4.2"."libc"}" deps)
+        (cratesIO.crates."log"."${deps."multicast_dns"."0.4.2"."log"}" deps)
+      ]);
+    };
+    features_.multicast_dns."0.4.2" = deps: f: updateFeatures f (rec {
+      libc."${deps.multicast_dns."0.4.2".libc}".default = true;
+      log."${deps.multicast_dns."0.4.2".log}".default = true;
+      multicast_dns."0.4.2".default = (f.multicast_dns."0.4.2".default or true);
+    }) [
+      (cratesIO.features_.libc."${deps."multicast_dns"."0.4.2"."libc"}" deps)
+      (cratesIO.features_.log."${deps."multicast_dns"."0.4.2"."log"}" deps)
     ];
 
 
@@ -49,44 +81,44 @@ rec {
   __all = [ (local_nix_cache {}) ];
   deps.actix."0.7.9" = {
     actix_derive = "0.3.2";
-    bitflags = "1.0.5";
+    bitflags = "1.1.0";
     bytes = "0.4.12";
-    crossbeam_channel = "0.3.8";
+    crossbeam_channel = "0.3.9";
     failure = "0.1.5";
     fnv = "1.0.6";
-    futures = "0.1.26";
-    log = "0.4.6";
+    futures = "0.1.29";
+    log = "0.4.8";
     parking_lot = "0.7.1";
-    smallvec = "0.6.9";
-    tokio = "0.1.19";
+    smallvec = "0.6.10";
+    tokio = "0.1.22";
     tokio_codec = "0.1.1";
-    tokio_executor = "0.1.7";
+    tokio_executor = "0.1.8";
     tokio_io = "0.1.12";
     tokio_reactor = "0.1.9";
     tokio_signal = "0.2.7";
     tokio_tcp = "0.1.3";
-    tokio_timer = "0.2.10";
+    tokio_timer = "0.2.11";
     trust_dns_proto = "0.5.0";
     trust_dns_resolver = "0.10.3";
     uuid = "0.7.4";
-    libc = "0.2.54";
+    libc = "0.2.62";
   };
   deps.actix_net."0.2.6" = {
     actix = "0.7.9";
     bytes = "0.4.12";
-    futures = "0.1.26";
-    log = "0.4.6";
-    mio = "0.6.16";
+    futures = "0.1.29";
+    log = "0.4.8";
+    mio = "0.6.19";
     net2 = "0.2.33";
-    num_cpus = "1.10.0";
+    num_cpus = "1.10.1";
     slab = "0.4.2";
-    tokio = "0.1.19";
+    tokio = "0.1.22";
     tokio_codec = "0.1.1";
     tokio_current_thread = "0.1.6";
     tokio_io = "0.1.12";
     tokio_reactor = "0.1.9";
     tokio_tcp = "0.1.3";
-    tokio_timer = "0.2.10";
+    tokio_timer = "0.2.11";
     tower_service = "0.1.0";
     trust_dns_resolver = "0.10.3";
   };
@@ -94,141 +126,142 @@ rec {
     actix = "0.7.9";
     actix_net = "0.2.6";
     base64 = "0.10.1";
-    bitflags = "1.0.5";
+    bitflags = "1.1.0";
     brotli2 = "0.3.2";
-    byteorder = "1.3.1";
+    byteorder = "1.3.2";
     bytes = "0.4.12";
     cookie = "0.11.1";
     encoding = "0.2.33";
     failure = "0.1.5";
-    flate2 = "1.0.7";
-    futures = "0.1.26";
+    flate2 = "1.0.11";
+    futures = "0.1.29";
     futures_cpupool = "0.1.8";
-    h2 = "0.1.18";
-    http = "0.1.17";
-    httparse = "1.3.3";
+    h2 = "0.1.26";
+    http = "0.1.18";
+    httparse = "1.3.4";
     language_tags = "0.2.2";
-    lazy_static = "1.3.0";
+    lazy_static = "1.4.0";
     lazycell = "1.2.1";
-    log = "0.4.6";
-    mime = "0.3.13";
-    mime_guess = "2.0.0-alpha.6";
-    mio = "0.6.16";
+    log = "0.4.8";
+    mime = "0.3.14";
+    mime_guess = "2.0.1";
+    mio = "0.6.19";
     net2 = "0.2.33";
-    num_cpus = "1.10.0";
+    num_cpus = "1.10.1";
     parking_lot = "0.7.1";
     percent_encoding = "1.0.1";
     rand = "0.6.5";
-    regex = "1.1.6";
-    serde = "1.0.90";
-    serde_json = "1.0.39";
+    regex = "1.3.1";
+    serde = "1.0.101";
+    serde_json = "1.0.40";
     serde_urlencoded = "0.5.5";
     sha1 = "0.6.0";
     slab = "0.4.2";
-    smallvec = "0.6.9";
+    smallvec = "0.6.10";
     time = "0.1.42";
-    tokio = "0.1.19";
+    tokio = "0.1.22";
     tokio_current_thread = "0.1.6";
     tokio_io = "0.1.12";
     tokio_reactor = "0.1.9";
     tokio_tcp = "0.1.3";
-    tokio_timer = "0.2.10";
+    tokio_timer = "0.2.11";
     url = "1.7.2";
-    v_htmlescape = "0.4.3";
+    v_htmlescape = "0.4.5";
     version_check = "0.1.5";
   };
   deps.actix_derive."0.3.2" = {
-    proc_macro2 = "0.4.29";
-    quote = "0.6.12";
-    syn = "0.15.33";
+    proc_macro2 = "0.4.30";
+    quote = "0.6.13";
+    syn = "0.15.44";
   };
-  deps.adler32."1.0.3" = {};
-  deps.aho_corasick."0.7.3" = {
-    memchr = "2.2.0";
+  deps.adler32."1.0.4" = {};
+  deps.aho_corasick."0.7.6" = {
+    memchr = "2.2.1";
   };
   deps.ansi_term."0.11.0" = {
-    winapi = "0.3.7";
+    winapi = "0.3.8";
   };
-  deps.arc_swap."0.3.11" = {};
-  deps.arrayvec."0.4.10" = {
+  deps.arc_swap."0.4.2" = {};
+  deps.arrayvec."0.4.11" = {
     nodrop = "0.1.13";
   };
-  deps.atty."0.2.11" = {
-    termion = "1.5.2";
-    libc = "0.2.54";
-    winapi = "0.3.7";
+  deps.atty."0.2.13" = {
+    libc = "0.2.62";
+    winapi = "0.3.8";
   };
-  deps.autocfg."0.1.2" = {};
-  deps.backtrace."0.3.15" = {
-    cfg_if = "0.1.7";
-    rustc_demangle = "0.1.14";
-    autocfg = "0.1.2";
-    backtrace_sys = "0.1.28";
-    libc = "0.2.54";
-    winapi = "0.3.7";
+  deps.autocfg."0.1.6" = {};
+  deps.backtrace."0.3.37" = {
+    backtrace_sys = "0.1.31";
+    cfg_if = "0.1.9";
+    libc = "0.2.62";
+    rustc_demangle = "0.1.16";
   };
-  deps.backtrace_sys."0.1.28" = {
-    libc = "0.2.54";
-    cc = "1.0.36";
+  deps.backtrace_sys."0.1.31" = {
+    libc = "0.2.62";
+    cc = "1.0.45";
   };
   deps.base64."0.9.3" = {
-    byteorder = "1.3.1";
-    safemem = "0.3.0";
+    byteorder = "1.3.2";
+    safemem = "0.3.2";
   };
   deps.base64."0.10.1" = {
-    byteorder = "1.3.1";
+    byteorder = "1.3.2";
   };
   deps.bindgen."0.42.3" = {
-    bitflags = "1.0.5";
+    bitflags = "1.1.0";
     cexpr = "0.3.5";
-    cfg_if = "0.1.7";
+    cfg_if = "0.1.9";
     clang_sys = "0.26.4";
     clap = "2.33.0";
     env_logger = "0.5.13";
-    lazy_static = "1.3.0";
-    log = "0.4.6";
+    lazy_static = "1.4.0";
+    log = "0.4.8";
     peeking_take_while = "0.1.2";
     proc_macro2 = "0.3.5";
     quote = "0.5.2";
-    regex = "1.1.6";
+    regex = "1.3.1";
     which = "1.0.5";
   };
-  deps.bitflags."1.0.5" = {};
+  deps.bitflags."1.1.0" = {};
   deps.brotli_sys."0.3.2" = {
-    libc = "0.2.54";
-    cc = "1.0.36";
+    libc = "0.2.62";
+    cc = "1.0.45";
   };
   deps.brotli2."0.3.2" = {
     brotli_sys = "0.3.2";
-    libc = "0.2.54";
+    libc = "0.2.62";
   };
-  deps.build_const."0.2.1" = {};
-  deps.byteorder."1.3.1" = {};
+  deps.byteorder."1.3.2" = {};
   deps.bytes."0.4.12" = {
-    byteorder = "1.3.1";
+    byteorder = "1.3.2";
+    either = "1.5.3";
     iovec = "0.1.2";
   };
-  deps.cc."1.0.36" = {};
+  deps.c2_chacha."0.2.2" = {
+    lazy_static = "1.4.0";
+    ppv_lite86 = "0.2.5";
+  };
+  deps.cc."1.0.45" = {};
   deps.cexpr."0.3.5" = {
     nom = "4.2.3";
   };
-  deps.cfg_if."0.1.7" = {};
+  deps.cfg_if."0.1.9" = {};
   deps.clang_sys."0.26.4" = {
     glob = "0.2.11";
-    libc = "0.2.54";
-    libloading = "0.5.0";
+    libc = "0.2.62";
+    libloading = "0.5.2";
   };
   deps.clap."2.33.0" = {
-    atty = "0.2.11";
-    bitflags = "1.0.5";
+    atty = "0.2.13";
+    bitflags = "1.1.0";
     strsim = "0.8.0";
     textwrap = "0.11.0";
-    unicode_width = "0.1.5";
+    unicode_width = "0.1.6";
     vec_map = "0.8.1";
     ansi_term = "0.11.0";
   };
   deps.cloudabi."0.0.3" = {
-    bitflags = "1.0.5";
+    bitflags = "1.1.0";
   };
   deps.cookie."0.11.1" = {
     base64 = "0.9.3";
@@ -236,55 +269,54 @@ rec {
     time = "0.1.42";
     url = "1.7.2";
   };
-  deps.cookie_store."0.5.1" = {
-    cookie = "0.11.1";
+  deps.cookie."0.12.0" = {
+    time = "0.1.42";
+    url = "1.7.2";
+  };
+  deps.cookie_store."0.7.0" = {
+    cookie = "0.12.0";
     failure = "0.1.5";
-    failure_derive = "0.1.5";
     idna = "0.1.5";
-    log = "0.4.6";
-    publicsuffix = "1.5.2";
-    serde = "1.0.90";
-    serde_derive = "1.0.90";
-    serde_json = "1.0.39";
+    log = "0.4.8";
+    publicsuffix = "1.5.3";
+    serde = "1.0.101";
+    serde_json = "1.0.40";
     time = "0.1.42";
     try_from = "0.3.2";
     url = "1.7.2";
   };
   deps.core_foundation."0.6.4" = {
     core_foundation_sys = "0.6.2";
-    libc = "0.2.54";
+    libc = "0.2.62";
   };
   deps.core_foundation_sys."0.6.2" = {};
-  deps.crc."1.8.1" = {
-    build_const = "0.2.1";
-  };
   deps.crc32fast."1.2.0" = {
-    cfg_if = "0.1.7";
+    cfg_if = "0.1.9";
   };
-  deps.crossbeam_channel."0.3.8" = {
-    crossbeam_utils = "0.6.5";
-    smallvec = "0.6.9";
+  deps.crossbeam_channel."0.3.9" = {
+    crossbeam_utils = "0.6.6";
   };
   deps.crossbeam_deque."0.7.1" = {
-    crossbeam_epoch = "0.7.1";
-    crossbeam_utils = "0.6.5";
+    crossbeam_epoch = "0.7.2";
+    crossbeam_utils = "0.6.6";
   };
-  deps.crossbeam_epoch."0.7.1" = {
-    arrayvec = "0.4.10";
-    cfg_if = "0.1.7";
-    crossbeam_utils = "0.6.5";
-    lazy_static = "1.3.0";
-    memoffset = "0.2.1";
-    scopeguard = "0.3.3";
+  deps.crossbeam_epoch."0.7.2" = {
+    arrayvec = "0.4.11";
+    cfg_if = "0.1.9";
+    crossbeam_utils = "0.6.6";
+    lazy_static = "1.4.0";
+    memoffset = "0.5.1";
+    scopeguard = "1.0.0";
   };
   deps.crossbeam_queue."0.1.2" = {
-    crossbeam_utils = "0.6.5";
+    crossbeam_utils = "0.6.6";
   };
-  deps.crossbeam_utils."0.6.5" = {
-    cfg_if = "0.1.7";
-    lazy_static = "1.3.0";
+  deps.crossbeam_utils."0.6.6" = {
+    cfg_if = "0.1.9";
+    lazy_static = "1.4.0";
   };
   deps.dtoa."0.4.4" = {};
+  deps.either."1.5.3" = {};
   deps.encoding."0.2.33" = {
     encoding_index_japanese = "1.20141219.5";
     encoding_index_korean = "1.20141219.5";
@@ -308,44 +340,45 @@ rec {
     encoding_index_tests = "0.1.4";
   };
   deps.encoding_index_tests."0.1.4" = {};
-  deps.encoding_rs."0.8.17" = {
-    cfg_if = "0.1.7";
+  deps.encoding_rs."0.8.20" = {
+    cfg_if = "0.1.9";
   };
   deps.env_logger."0.5.13" = {
-    atty = "0.2.11";
-    humantime = "1.2.0";
-    log = "0.4.6";
-    regex = "1.1.6";
-    termcolor = "1.0.4";
+    atty = "0.2.13";
+    humantime = "1.3.0";
+    log = "0.4.8";
+    regex = "1.3.1";
+    termcolor = "1.0.5";
   };
-  deps.env_logger."0.6.1" = {
-    atty = "0.2.11";
-    humantime = "1.2.0";
-    log = "0.4.6";
-    regex = "1.1.6";
-    termcolor = "1.0.4";
+  deps.env_logger."0.6.2" = {
+    atty = "0.2.13";
+    humantime = "1.3.0";
+    log = "0.4.8";
+    regex = "1.3.1";
+    termcolor = "1.0.5";
   };
   deps.error_chain."0.8.1" = {
-    backtrace = "0.3.15";
+    backtrace = "0.3.37";
   };
-  deps.error_chain."0.12.0" = {
-    backtrace = "0.3.15";
+  deps.error_chain."0.12.1" = {
+    backtrace = "0.3.37";
+    version_check = "0.1.5";
   };
   deps.failure."0.1.5" = {
-    backtrace = "0.3.15";
+    backtrace = "0.3.37";
     failure_derive = "0.1.5";
   };
   deps.failure_derive."0.1.5" = {
-    proc_macro2 = "0.4.29";
-    quote = "0.6.12";
-    syn = "0.15.33";
-    synstructure = "0.10.1";
+    proc_macro2 = "0.4.30";
+    quote = "0.6.13";
+    syn = "0.15.44";
+    synstructure = "0.10.2";
   };
-  deps.flate2."1.0.7" = {
+  deps.flate2."1.0.11" = {
     crc32fast = "1.2.0";
-    libc = "0.2.54";
-    miniz_sys = "0.1.11";
-    miniz_oxide_c_api = "0.2.1";
+    libc = "0.2.62";
+    miniz_sys = "0.1.12";
+    miniz_oxide = "0.3.2";
   };
   deps.fnv."1.0.6" = {};
   deps.foreign_types."0.3.2" = {
@@ -354,67 +387,80 @@ rec {
   deps.foreign_types_shared."0.1.1" = {};
   deps.fuchsia_cprng."0.1.1" = {};
   deps.fuchsia_zircon."0.3.3" = {
-    bitflags = "1.0.5";
+    bitflags = "1.1.0";
     fuchsia_zircon_sys = "0.3.3";
   };
   deps.fuchsia_zircon_sys."0.3.3" = {};
-  deps.futures."0.1.26" = {};
+  deps.futures."0.1.29" = {};
   deps.futures_cpupool."0.1.8" = {
-    futures = "0.1.26";
-    num_cpus = "1.10.0";
+    futures = "0.1.29";
+    num_cpus = "1.10.1";
+  };
+  deps.getrandom."0.1.12" = {
+    cfg_if = "0.1.9";
+    libc = "0.2.62";
+    wasi = "0.7.0";
   };
   deps.glob."0.2.11" = {};
-  deps.h2."0.1.18" = {
-    byteorder = "1.3.1";
+  deps.h2."0.1.26" = {
+    byteorder = "1.3.2";
     bytes = "0.4.12";
     fnv = "1.0.6";
-    futures = "0.1.26";
-    http = "0.1.17";
-    indexmap = "1.0.2";
-    log = "0.4.6";
+    futures = "0.1.29";
+    http = "0.1.18";
+    indexmap = "1.2.0";
+    log = "0.4.8";
     slab = "0.4.2";
-    string = "0.1.3";
+    string = "0.2.1";
     tokio_io = "0.1.12";
   };
   deps.hostname."0.1.5" = {
-    libc = "0.2.54";
+    libc = "0.2.62";
     winutil = "0.1.1";
   };
-  deps.http."0.1.17" = {
+  deps.http."0.1.18" = {
     bytes = "0.4.12";
     fnv = "1.0.6";
     itoa = "0.4.4";
   };
-  deps.httparse."1.3.3" = {};
-  deps.humantime."1.2.0" = {
+  deps.http_body."0.1.0" = {
+    bytes = "0.4.12";
+    futures = "0.1.29";
+    http = "0.1.18";
+    tokio_buf = "0.1.1";
+  };
+  deps.httparse."1.3.4" = {};
+  deps.humantime."1.3.0" = {
     quick_error = "1.2.2";
   };
-  deps.hyper."0.12.28" = {
+  deps.hyper."0.12.35" = {
     bytes = "0.4.12";
-    futures = "0.1.26";
+    futures = "0.1.29";
     futures_cpupool = "0.1.8";
-    h2 = "0.1.18";
-    http = "0.1.17";
-    httparse = "1.3.3";
+    h2 = "0.1.26";
+    http = "0.1.18";
+    http_body = "0.1.0";
+    httparse = "1.3.4";
     iovec = "0.1.2";
     itoa = "0.4.4";
-    log = "0.4.6";
+    log = "0.4.8";
     net2 = "0.2.33";
     time = "0.1.42";
-    tokio = "0.1.19";
-    tokio_executor = "0.1.7";
+    tokio = "0.1.22";
+    tokio_buf = "0.1.1";
+    tokio_executor = "0.1.8";
     tokio_io = "0.1.12";
     tokio_reactor = "0.1.9";
     tokio_tcp = "0.1.3";
-    tokio_threadpool = "0.1.14";
-    tokio_timer = "0.2.10";
-    want = "0.0.6";
+    tokio_threadpool = "0.1.15";
+    tokio_timer = "0.2.11";
+    want = "0.2.0";
     rustc_version = "0.2.3";
   };
   deps.hyper_tls."0.3.2" = {
     bytes = "0.4.12";
-    futures = "0.1.26";
-    hyper = "0.12.28";
+    futures = "0.1.29";
+    hyper = "0.12.35";
     native_tls = "0.2.3";
     tokio_io = "0.1.12";
   };
@@ -423,16 +469,21 @@ rec {
     unicode_bidi = "0.3.4";
     unicode_normalization = "0.1.8";
   };
-  deps.indexmap."1.0.2" = {};
+  deps.idna."0.2.0" = {
+    matches = "0.1.8";
+    unicode_bidi = "0.3.4";
+    unicode_normalization = "0.1.8";
+  };
+  deps.indexmap."1.2.0" = {};
   deps.iovec."0.1.2" = {
-    libc = "0.2.54";
+    libc = "0.2.62";
     winapi = "0.2.8";
   };
   deps.ipconfig."0.1.9" = {
     error_chain = "0.8.1";
-    socket2 = "0.3.8";
+    socket2 = "0.3.11";
     widestring = "0.2.2";
-    winapi = "0.3.7";
+    winapi = "0.3.8";
     winreg = "0.5.1";
   };
   deps.itoa."0.4.4" = {};
@@ -441,78 +492,70 @@ rec {
     winapi_build = "0.1.1";
   };
   deps.language_tags."0.2.2" = {};
-  deps.lazy_static."1.3.0" = {};
+  deps.lazy_static."1.4.0" = {};
   deps.lazycell."1.2.1" = {};
-  deps.libc."0.2.54" = {};
-  deps.libloading."0.5.0" = {
-    cc = "1.0.36";
-    winapi = "0.3.7";
+  deps.libc."0.2.62" = {};
+  deps.libloading."0.5.2" = {
+    cc = "1.0.45";
+    winapi = "0.3.8";
   };
   deps.libnixstore_sys."0.1.0" = {
     bindgen = "0.42.3";
-    pkg_config = "0.3.14";
+    pkg_config = "0.3.16";
   };
   deps.linked_hash_map."0.5.2" = {};
   deps.local_nix_cache."0.1.0" = {
     actix_web = "0.7.19";
     clap = "2.33.0";
-    env_logger = "0.6.1";
+    env_logger = "0.6.2";
     libnixstore_sys = "0.1.0";
-    reqwest = "0.9.16";
+    multicast_dns = "0.4.2";
+    reqwest = "0.9.20";
     tempdir = "0.3.7";
   };
   deps.lock_api."0.1.5" = {
     owning_ref = "0.4.0";
     scopeguard = "0.3.3";
   };
-  deps.log."0.4.6" = {
-    cfg_if = "0.1.7";
+  deps.log."0.4.8" = {
+    cfg_if = "0.1.9";
   };
   deps.lru_cache."0.1.2" = {
     linked_hash_map = "0.5.2";
   };
   deps.matches."0.1.8" = {};
-  deps.memchr."2.2.0" = {};
-  deps.memoffset."0.2.1" = {};
-  deps.mime."0.3.13" = {
-    unicase = "2.4.0";
+  deps.memchr."2.2.1" = {};
+  deps.memoffset."0.5.1" = {
+    rustc_version = "0.2.3";
   };
-  deps.mime_guess."2.0.0-alpha.6" = {
-    mime = "0.3.13";
-    phf = "0.7.24";
-    unicase = "1.4.2";
-    phf_codegen = "0.7.24";
+  deps.mime."0.3.14" = {};
+  deps.mime_guess."2.0.1" = {
+    mime = "0.3.14";
+    unicase = "2.5.1";
   };
-  deps.miniz_sys."0.1.11" = {
-    libc = "0.2.54";
-    cc = "1.0.36";
+  deps.miniz_sys."0.1.12" = {
+    libc = "0.2.62";
+    cc = "1.0.45";
   };
-  deps.miniz_oxide."0.2.1" = {
-    adler32 = "1.0.3";
+  deps.miniz_oxide."0.3.2" = {
+    adler32 = "1.0.4";
   };
-  deps.miniz_oxide_c_api."0.2.1" = {
-    crc = "1.8.1";
-    libc = "0.2.54";
-    miniz_oxide = "0.2.1";
-    cc = "1.0.36";
-  };
-  deps.mio."0.6.16" = {
+  deps.mio."0.6.19" = {
     iovec = "0.1.2";
-    lazycell = "1.2.1";
-    log = "0.4.6";
+    log = "0.4.8";
     net2 = "0.2.33";
     slab = "0.4.2";
     fuchsia_zircon = "0.3.3";
     fuchsia_zircon_sys = "0.3.3";
-    libc = "0.2.54";
+    libc = "0.2.62";
     kernel32_sys = "0.2.2";
     miow = "0.2.1";
     winapi = "0.2.8";
   };
   deps.mio_uds."0.6.7" = {
     iovec = "0.1.2";
-    libc = "0.2.54";
-    mio = "0.6.16";
+    libc = "0.2.62";
+    mio = "0.6.19";
   };
   deps.miow."0.2.1" = {
     kernel32_sys = "0.2.2";
@@ -520,46 +563,49 @@ rec {
     winapi = "0.2.8";
     ws2_32_sys = "0.2.1";
   };
+  deps.multicast_dns."0.4.2" = {
+    libc = "0.2.62";
+    log = "0.4.8";
+  };
   deps.native_tls."0.2.3" = {
-    lazy_static = "1.3.0";
-    libc = "0.2.54";
+    lazy_static = "1.4.0";
+    libc = "0.2.62";
     security_framework = "0.3.1";
     security_framework_sys = "0.3.1";
-    tempfile = "3.0.7";
-    log = "0.4.6";
-    openssl = "0.10.21";
+    tempfile = "3.1.0";
+    log = "0.4.8";
+    openssl = "0.10.24";
     openssl_probe = "0.1.2";
-    openssl_sys = "0.9.45";
-    schannel = "0.1.15";
+    openssl_sys = "0.9.49";
+    schannel = "0.1.16";
   };
   deps.net2."0.2.33" = {
-    cfg_if = "0.1.7";
-    libc = "0.2.54";
-    winapi = "0.3.7";
+    cfg_if = "0.1.9";
+    libc = "0.2.62";
+    winapi = "0.3.8";
   };
   deps.nodrop."0.1.13" = {};
   deps.nom."4.2.3" = {
-    memchr = "2.2.0";
+    memchr = "2.2.1";
     version_check = "0.1.5";
   };
-  deps.num_cpus."1.10.0" = {
-    libc = "0.2.54";
+  deps.num_cpus."1.10.1" = {
+    libc = "0.2.62";
   };
-  deps.numtoa."0.1.0" = {};
-  deps.openssl."0.10.21" = {
-    bitflags = "1.0.5";
-    cfg_if = "0.1.7";
+  deps.openssl."0.10.24" = {
+    bitflags = "1.1.0";
+    cfg_if = "0.1.9";
     foreign_types = "0.3.2";
-    lazy_static = "1.3.0";
-    libc = "0.2.54";
-    openssl_sys = "0.9.45";
+    lazy_static = "1.4.0";
+    libc = "0.2.62";
+    openssl_sys = "0.9.49";
   };
   deps.openssl_probe."0.1.2" = {};
-  deps.openssl_sys."0.9.45" = {
-    libc = "0.2.54";
-    autocfg = "0.1.2";
-    cc = "1.0.36";
-    pkg_config = "0.3.14";
+  deps.openssl_sys."0.9.49" = {
+    libc = "0.2.62";
+    autocfg = "0.1.6";
+    cc = "1.0.45";
+    pkg_config = "0.3.16";
   };
   deps.owning_ref."0.4.0" = {
     stable_deref_trait = "1.1.1";
@@ -570,106 +616,115 @@ rec {
   };
   deps.parking_lot_core."0.4.0" = {
     rand = "0.6.5";
-    smallvec = "0.6.9";
+    smallvec = "0.6.10";
     rustc_version = "0.2.3";
-    libc = "0.2.54";
-    winapi = "0.3.7";
+    libc = "0.2.62";
+    winapi = "0.3.8";
   };
   deps.peeking_take_while."0.1.2" = {};
   deps.percent_encoding."1.0.1" = {};
-  deps.phf."0.7.24" = {
-    phf_shared = "0.7.24";
-  };
-  deps.phf_codegen."0.7.24" = {
-    phf_generator = "0.7.24";
-    phf_shared = "0.7.24";
-  };
-  deps.phf_generator."0.7.24" = {
-    phf_shared = "0.7.24";
-    rand = "0.6.5";
-  };
-  deps.phf_shared."0.7.24" = {
-    siphasher = "0.2.3";
-    unicase = "1.4.2";
-  };
-  deps.pkg_config."0.3.14" = {};
+  deps.percent_encoding."2.1.0" = {};
+  deps.pkg_config."0.3.16" = {};
+  deps.ppv_lite86."0.2.5" = {};
   deps.proc_macro2."0.3.5" = {
     unicode_xid = "0.1.0";
   };
-  deps.proc_macro2."0.4.29" = {
+  deps.proc_macro2."0.4.30" = {
     unicode_xid = "0.1.0";
   };
-  deps.publicsuffix."1.5.2" = {
-    error_chain = "0.12.0";
-    idna = "0.1.5";
-    lazy_static = "1.3.0";
-    regex = "1.1.6";
-    url = "1.7.2";
+  deps.proc_macro2."1.0.3" = {
+    unicode_xid = "0.2.0";
+  };
+  deps.publicsuffix."1.5.3" = {
+    error_chain = "0.12.1";
+    idna = "0.2.0";
+    lazy_static = "1.4.0";
+    regex = "1.3.1";
+    url = "2.1.0";
   };
   deps.quick_error."1.2.2" = {};
   deps.quote."0.5.2" = {
     proc_macro2 = "0.3.5";
   };
-  deps.quote."0.6.12" = {
-    proc_macro2 = "0.4.29";
+  deps.quote."0.6.13" = {
+    proc_macro2 = "0.4.30";
+  };
+  deps.quote."1.0.2" = {
+    proc_macro2 = "1.0.3";
   };
   deps.rand."0.4.6" = {
     rand_core = "0.3.1";
     rdrand = "0.4.0";
     fuchsia_cprng = "0.1.1";
-    libc = "0.2.54";
-    winapi = "0.3.7";
+    libc = "0.2.62";
+    winapi = "0.3.8";
   };
   deps.rand."0.5.6" = {
     rand_core = "0.3.1";
     cloudabi = "0.0.3";
     fuchsia_cprng = "0.1.1";
-    libc = "0.2.54";
-    winapi = "0.3.7";
+    libc = "0.2.62";
+    winapi = "0.3.8";
   };
   deps.rand."0.6.5" = {
     rand_chacha = "0.1.1";
-    rand_core = "0.4.0";
+    rand_core = "0.4.2";
     rand_hc = "0.1.0";
     rand_isaac = "0.1.1";
     rand_jitter = "0.1.4";
     rand_os = "0.1.3";
     rand_pcg = "0.1.2";
     rand_xorshift = "0.1.1";
-    autocfg = "0.1.2";
-    libc = "0.2.54";
-    winapi = "0.3.7";
+    autocfg = "0.1.6";
+    libc = "0.2.62";
+    winapi = "0.3.8";
+  };
+  deps.rand."0.7.2" = {
+    rand_core = "0.5.1";
+    rand_chacha = "0.2.1";
+    rand_hc = "0.2.0";
+    libc = "0.2.62";
   };
   deps.rand_chacha."0.1.1" = {
     rand_core = "0.3.1";
-    autocfg = "0.1.2";
+    autocfg = "0.1.6";
+  };
+  deps.rand_chacha."0.2.1" = {
+    c2_chacha = "0.2.2";
+    rand_core = "0.5.1";
   };
   deps.rand_core."0.3.1" = {
-    rand_core = "0.4.0";
+    rand_core = "0.4.2";
   };
-  deps.rand_core."0.4.0" = {};
+  deps.rand_core."0.4.2" = {};
+  deps.rand_core."0.5.1" = {
+    getrandom = "0.1.12";
+  };
   deps.rand_hc."0.1.0" = {
     rand_core = "0.3.1";
+  };
+  deps.rand_hc."0.2.0" = {
+    rand_core = "0.5.1";
   };
   deps.rand_isaac."0.1.1" = {
     rand_core = "0.3.1";
   };
   deps.rand_jitter."0.1.4" = {
-    rand_core = "0.4.0";
-    libc = "0.2.54";
-    winapi = "0.3.7";
+    rand_core = "0.4.2";
+    libc = "0.2.62";
+    winapi = "0.3.8";
   };
   deps.rand_os."0.1.3" = {
-    rand_core = "0.4.0";
+    rand_core = "0.4.2";
     rdrand = "0.4.0";
     cloudabi = "0.0.3";
     fuchsia_cprng = "0.1.1";
-    libc = "0.2.54";
-    winapi = "0.3.7";
+    libc = "0.2.62";
+    winapi = "0.3.8";
   };
   deps.rand_pcg."0.1.2" = {
-    rand_core = "0.4.0";
-    autocfg = "0.1.2";
+    rand_core = "0.4.2";
+    autocfg = "0.1.6";
   };
   deps.rand_xorshift."0.1.1" = {
     rand_core = "0.3.1";
@@ -677,49 +732,44 @@ rec {
   deps.rdrand."0.4.0" = {
     rand_core = "0.3.1";
   };
-  deps.redox_syscall."0.1.54" = {};
-  deps.redox_termios."0.1.1" = {
-    redox_syscall = "0.1.54";
-  };
-  deps.regex."1.1.6" = {
-    aho_corasick = "0.7.3";
-    memchr = "2.2.0";
-    regex_syntax = "0.6.6";
+  deps.redox_syscall."0.1.56" = {};
+  deps.regex."1.3.1" = {
+    aho_corasick = "0.7.6";
+    memchr = "2.2.1";
+    regex_syntax = "0.6.12";
     thread_local = "0.3.6";
-    utf8_ranges = "1.0.2";
   };
-  deps.regex_syntax."0.6.6" = {
-    ucd_util = "0.1.3";
+  deps.regex_syntax."0.6.12" = {};
+  deps.remove_dir_all."0.5.2" = {
+    winapi = "0.3.8";
   };
-  deps.remove_dir_all."0.5.1" = {
-    winapi = "0.3.7";
-  };
-  deps.reqwest."0.9.16" = {
+  deps.reqwest."0.9.20" = {
     base64 = "0.10.1";
     bytes = "0.4.12";
-    cookie = "0.11.1";
-    cookie_store = "0.5.1";
-    encoding_rs = "0.8.17";
-    flate2 = "1.0.7";
-    futures = "0.1.26";
-    http = "0.1.17";
-    hyper = "0.12.28";
+    cookie = "0.12.0";
+    cookie_store = "0.7.0";
+    encoding_rs = "0.8.20";
+    flate2 = "1.0.11";
+    futures = "0.1.29";
+    http = "0.1.18";
+    hyper = "0.12.35";
     hyper_tls = "0.3.2";
-    log = "0.4.6";
-    mime = "0.3.13";
-    mime_guess = "2.0.0-alpha.6";
+    log = "0.4.8";
+    mime = "0.3.14";
+    mime_guess = "2.0.1";
     native_tls = "0.2.3";
-    serde = "1.0.90";
-    serde_json = "1.0.39";
+    serde = "1.0.101";
+    serde_json = "1.0.40";
     serde_urlencoded = "0.5.5";
     time = "0.1.42";
-    tokio = "0.1.19";
-    tokio_executor = "0.1.7";
+    tokio = "0.1.22";
+    tokio_executor = "0.1.8";
     tokio_io = "0.1.12";
-    tokio_threadpool = "0.1.14";
-    tokio_timer = "0.2.10";
+    tokio_threadpool = "0.1.15";
+    tokio_timer = "0.2.11";
     url = "1.7.2";
     uuid = "0.7.4";
+    winreg = "0.6.2";
   };
   deps.resolv_conf."0.6.2" = {
     hostname = "0.1.5";
@@ -727,25 +777,26 @@ rec {
   };
   deps.ring."0.13.5" = {
     untrusted = "0.6.2";
-    cc = "1.0.36";
-    lazy_static = "1.3.0";
-    libc = "0.2.54";
+    cc = "1.0.45";
+    lazy_static = "1.4.0";
+    libc = "0.2.62";
   };
-  deps.rustc_demangle."0.1.14" = {};
+  deps.rustc_demangle."0.1.16" = {};
   deps.rustc_version."0.2.3" = {
     semver = "0.9.0";
   };
-  deps.ryu."0.2.8" = {};
-  deps.safemem."0.3.0" = {};
-  deps.schannel."0.1.15" = {
-    lazy_static = "1.3.0";
-    winapi = "0.3.7";
+  deps.ryu."1.0.0" = {};
+  deps.safemem."0.3.2" = {};
+  deps.schannel."0.1.16" = {
+    lazy_static = "1.4.0";
+    winapi = "0.3.8";
   };
   deps.scopeguard."0.3.3" = {};
+  deps.scopeguard."1.0.0" = {};
   deps.security_framework."0.3.1" = {
     core_foundation = "0.6.4";
     core_foundation_sys = "0.6.2";
-    libc = "0.2.54";
+    libc = "0.2.62";
     security_framework_sys = "0.3.1";
   };
   deps.security_framework_sys."0.3.1" = {
@@ -755,277 +806,277 @@ rec {
     semver_parser = "0.7.0";
   };
   deps.semver_parser."0.7.0" = {};
-  deps.serde."1.0.90" = {};
-  deps.serde_derive."1.0.90" = {
-    proc_macro2 = "0.4.29";
-    quote = "0.6.12";
-    syn = "0.15.33";
+  deps.serde."1.0.101" = {
+    serde_derive = "1.0.101";
   };
-  deps.serde_json."1.0.39" = {
+  deps.serde_derive."1.0.101" = {
+    proc_macro2 = "1.0.3";
+    quote = "1.0.2";
+    syn = "1.0.5";
+  };
+  deps.serde_json."1.0.40" = {
     itoa = "0.4.4";
-    ryu = "0.2.8";
-    serde = "1.0.90";
+    ryu = "1.0.0";
+    serde = "1.0.101";
   };
   deps.serde_urlencoded."0.5.5" = {
     dtoa = "0.4.4";
     itoa = "0.4.4";
-    serde = "1.0.90";
+    serde = "1.0.101";
     url = "1.7.2";
   };
   deps.sha1."0.6.0" = {};
-  deps.signal_hook."0.1.9" = {
-    libc = "0.2.54";
-    signal_hook_registry = "1.0.1";
+  deps.signal_hook."0.1.10" = {
+    libc = "0.2.62";
+    signal_hook_registry = "1.1.1";
   };
-  deps.signal_hook_registry."1.0.1" = {
-    arc_swap = "0.3.11";
-    libc = "0.2.54";
+  deps.signal_hook_registry."1.1.1" = {
+    arc_swap = "0.4.2";
+    libc = "0.2.62";
   };
-  deps.siphasher."0.2.3" = {};
   deps.slab."0.4.2" = {};
-  deps.smallvec."0.6.9" = {};
-  deps.socket2."0.3.8" = {
-    cfg_if = "0.1.7";
-    libc = "0.2.54";
-    redox_syscall = "0.1.54";
-    winapi = "0.3.7";
+  deps.smallvec."0.6.10" = {};
+  deps.socket2."0.3.11" = {
+    cfg_if = "0.1.9";
+    libc = "0.2.62";
+    redox_syscall = "0.1.56";
+    winapi = "0.3.8";
   };
   deps.stable_deref_trait."1.1.1" = {};
-  deps.string."0.1.3" = {};
+  deps.string."0.2.1" = {
+    bytes = "0.4.12";
+  };
   deps.strsim."0.8.0" = {};
-  deps.syn."0.15.33" = {
-    proc_macro2 = "0.4.29";
-    quote = "0.6.12";
+  deps.syn."0.15.44" = {
+    proc_macro2 = "0.4.30";
+    quote = "0.6.13";
     unicode_xid = "0.1.0";
   };
-  deps.synstructure."0.10.1" = {
-    proc_macro2 = "0.4.29";
-    quote = "0.6.12";
-    syn = "0.15.33";
+  deps.syn."1.0.5" = {
+    proc_macro2 = "1.0.3";
+    quote = "1.0.2";
+    unicode_xid = "0.2.0";
+  };
+  deps.synstructure."0.10.2" = {
+    proc_macro2 = "0.4.30";
+    quote = "0.6.13";
+    syn = "0.15.44";
     unicode_xid = "0.1.0";
   };
   deps.tempdir."0.3.7" = {
     rand = "0.4.6";
-    remove_dir_all = "0.5.1";
+    remove_dir_all = "0.5.2";
   };
-  deps.tempfile."3.0.7" = {
-    cfg_if = "0.1.7";
-    rand = "0.6.5";
-    remove_dir_all = "0.5.1";
-    redox_syscall = "0.1.54";
-    libc = "0.2.54";
-    winapi = "0.3.7";
+  deps.tempfile."3.1.0" = {
+    cfg_if = "0.1.9";
+    rand = "0.7.2";
+    remove_dir_all = "0.5.2";
+    redox_syscall = "0.1.56";
+    libc = "0.2.62";
+    winapi = "0.3.8";
   };
-  deps.termcolor."1.0.4" = {
-    wincolor = "1.0.1";
-  };
-  deps.termion."1.5.2" = {
-    numtoa = "0.1.0";
-    libc = "0.2.54";
-    redox_syscall = "0.1.54";
-    redox_termios = "0.1.1";
+  deps.termcolor."1.0.5" = {
+    wincolor = "1.0.2";
   };
   deps.textwrap."0.11.0" = {
-    unicode_width = "0.1.5";
+    unicode_width = "0.1.6";
   };
   deps.thread_local."0.3.6" = {
-    lazy_static = "1.3.0";
+    lazy_static = "1.4.0";
   };
   deps.time."0.1.42" = {
-    libc = "0.2.54";
-    redox_syscall = "0.1.54";
-    winapi = "0.3.7";
+    libc = "0.2.62";
+    redox_syscall = "0.1.56";
+    winapi = "0.3.8";
   };
-  deps.tokio."0.1.19" = {
+  deps.tokio."0.1.22" = {
     bytes = "0.4.12";
-    futures = "0.1.26";
-    mio = "0.6.16";
-    num_cpus = "1.10.0";
+    futures = "0.1.29";
+    mio = "0.6.19";
+    num_cpus = "1.10.1";
     tokio_codec = "0.1.1";
     tokio_current_thread = "0.1.6";
-    tokio_executor = "0.1.7";
+    tokio_executor = "0.1.8";
     tokio_fs = "0.1.6";
     tokio_io = "0.1.12";
     tokio_reactor = "0.1.9";
-    tokio_sync = "0.1.5";
+    tokio_sync = "0.1.6";
     tokio_tcp = "0.1.3";
-    tokio_threadpool = "0.1.14";
-    tokio_timer = "0.2.10";
-    tokio_trace_core = "0.1.0";
-    tokio_udp = "0.1.3";
+    tokio_threadpool = "0.1.15";
+    tokio_timer = "0.2.11";
+    tokio_udp = "0.1.5";
     tokio_uds = "0.2.5";
+  };
+  deps.tokio_buf."0.1.1" = {
+    bytes = "0.4.12";
+    either = "1.5.3";
+    futures = "0.1.29";
   };
   deps.tokio_codec."0.1.1" = {
     bytes = "0.4.12";
-    futures = "0.1.26";
+    futures = "0.1.29";
     tokio_io = "0.1.12";
   };
   deps.tokio_current_thread."0.1.6" = {
-    futures = "0.1.26";
-    tokio_executor = "0.1.7";
+    futures = "0.1.29";
+    tokio_executor = "0.1.8";
   };
-  deps.tokio_executor."0.1.7" = {
-    crossbeam_utils = "0.6.5";
-    futures = "0.1.26";
+  deps.tokio_executor."0.1.8" = {
+    crossbeam_utils = "0.6.6";
+    futures = "0.1.29";
   };
   deps.tokio_fs."0.1.6" = {
-    futures = "0.1.26";
+    futures = "0.1.29";
     tokio_io = "0.1.12";
-    tokio_threadpool = "0.1.14";
+    tokio_threadpool = "0.1.15";
   };
   deps.tokio_io."0.1.12" = {
     bytes = "0.4.12";
-    futures = "0.1.26";
-    log = "0.4.6";
+    futures = "0.1.29";
+    log = "0.4.8";
   };
   deps.tokio_reactor."0.1.9" = {
-    crossbeam_utils = "0.6.5";
-    futures = "0.1.26";
-    lazy_static = "1.3.0";
-    log = "0.4.6";
-    mio = "0.6.16";
-    num_cpus = "1.10.0";
+    crossbeam_utils = "0.6.6";
+    futures = "0.1.29";
+    lazy_static = "1.4.0";
+    log = "0.4.8";
+    mio = "0.6.19";
+    num_cpus = "1.10.1";
     parking_lot = "0.7.1";
     slab = "0.4.2";
-    tokio_executor = "0.1.7";
+    tokio_executor = "0.1.8";
     tokio_io = "0.1.12";
-    tokio_sync = "0.1.5";
+    tokio_sync = "0.1.6";
   };
   deps.tokio_signal."0.2.7" = {
-    futures = "0.1.26";
-    mio = "0.6.16";
-    tokio_executor = "0.1.7";
+    futures = "0.1.29";
+    mio = "0.6.19";
+    tokio_executor = "0.1.8";
     tokio_io = "0.1.12";
     tokio_reactor = "0.1.9";
-    libc = "0.2.54";
+    libc = "0.2.62";
     mio_uds = "0.6.7";
-    signal_hook = "0.1.9";
-    winapi = "0.3.7";
+    signal_hook = "0.1.10";
+    winapi = "0.3.8";
   };
-  deps.tokio_sync."0.1.5" = {
+  deps.tokio_sync."0.1.6" = {
     fnv = "1.0.6";
-    futures = "0.1.26";
+    futures = "0.1.29";
   };
   deps.tokio_tcp."0.1.3" = {
     bytes = "0.4.12";
-    futures = "0.1.26";
+    futures = "0.1.29";
     iovec = "0.1.2";
-    mio = "0.6.16";
+    mio = "0.6.19";
     tokio_io = "0.1.12";
     tokio_reactor = "0.1.9";
   };
-  deps.tokio_threadpool."0.1.14" = {
+  deps.tokio_threadpool."0.1.15" = {
     crossbeam_deque = "0.7.1";
     crossbeam_queue = "0.1.2";
-    crossbeam_utils = "0.6.5";
-    futures = "0.1.26";
-    log = "0.4.6";
-    num_cpus = "1.10.0";
+    crossbeam_utils = "0.6.6";
+    futures = "0.1.29";
+    log = "0.4.8";
+    num_cpus = "1.10.1";
     rand = "0.6.5";
     slab = "0.4.2";
-    tokio_executor = "0.1.7";
+    tokio_executor = "0.1.8";
   };
-  deps.tokio_timer."0.2.10" = {
-    crossbeam_utils = "0.6.5";
-    futures = "0.1.26";
+  deps.tokio_timer."0.2.11" = {
+    crossbeam_utils = "0.6.6";
+    futures = "0.1.29";
     slab = "0.4.2";
-    tokio_executor = "0.1.7";
+    tokio_executor = "0.1.8";
   };
-  deps.tokio_trace_core."0.1.0" = {
-    lazy_static = "1.3.0";
-  };
-  deps.tokio_udp."0.1.3" = {
+  deps.tokio_udp."0.1.5" = {
     bytes = "0.4.12";
-    futures = "0.1.26";
-    log = "0.4.6";
-    mio = "0.6.16";
+    futures = "0.1.29";
+    log = "0.4.8";
+    mio = "0.6.19";
     tokio_codec = "0.1.1";
     tokio_io = "0.1.12";
     tokio_reactor = "0.1.9";
   };
   deps.tokio_uds."0.2.5" = {
     bytes = "0.4.12";
-    futures = "0.1.26";
+    futures = "0.1.29";
     iovec = "0.1.2";
-    libc = "0.2.54";
-    log = "0.4.6";
-    mio = "0.6.16";
+    libc = "0.2.62";
+    log = "0.4.8";
+    mio = "0.6.19";
     mio_uds = "0.6.7";
     tokio_codec = "0.1.1";
     tokio_io = "0.1.12";
     tokio_reactor = "0.1.9";
   };
   deps.tower_service."0.1.0" = {
-    futures = "0.1.26";
+    futures = "0.1.29";
   };
   deps.trust_dns_proto."0.5.0" = {
-    byteorder = "1.3.1";
+    byteorder = "1.3.2";
     failure = "0.1.5";
-    futures = "0.1.26";
+    futures = "0.1.29";
     idna = "0.1.5";
-    lazy_static = "1.3.0";
-    log = "0.4.6";
+    lazy_static = "1.4.0";
+    log = "0.4.8";
     rand = "0.5.6";
-    smallvec = "0.6.9";
-    socket2 = "0.3.8";
-    tokio_executor = "0.1.7";
+    smallvec = "0.6.10";
+    socket2 = "0.3.11";
+    tokio_executor = "0.1.8";
     tokio_io = "0.1.12";
     tokio_reactor = "0.1.9";
     tokio_tcp = "0.1.3";
-    tokio_timer = "0.2.10";
-    tokio_udp = "0.1.3";
+    tokio_timer = "0.2.11";
+    tokio_udp = "0.1.5";
     url = "1.7.2";
   };
   deps.trust_dns_proto."0.6.3" = {
-    byteorder = "1.3.1";
+    byteorder = "1.3.2";
     failure = "0.1.5";
-    futures = "0.1.26";
+    futures = "0.1.29";
     idna = "0.1.5";
-    lazy_static = "1.3.0";
-    log = "0.4.6";
+    lazy_static = "1.4.0";
+    log = "0.4.8";
     rand = "0.5.6";
-    smallvec = "0.6.9";
-    socket2 = "0.3.8";
-    tokio_executor = "0.1.7";
+    smallvec = "0.6.10";
+    socket2 = "0.3.11";
+    tokio_executor = "0.1.8";
     tokio_io = "0.1.12";
     tokio_reactor = "0.1.9";
     tokio_tcp = "0.1.3";
-    tokio_timer = "0.2.10";
-    tokio_udp = "0.1.3";
+    tokio_timer = "0.2.11";
+    tokio_udp = "0.1.5";
     url = "1.7.2";
   };
   deps.trust_dns_resolver."0.10.3" = {
-    cfg_if = "0.1.7";
+    cfg_if = "0.1.9";
     failure = "0.1.5";
-    futures = "0.1.26";
-    lazy_static = "1.3.0";
-    log = "0.4.6";
+    futures = "0.1.29";
+    lazy_static = "1.4.0";
+    log = "0.4.8";
     lru_cache = "0.1.2";
     resolv_conf = "0.6.2";
-    smallvec = "0.6.9";
-    tokio = "0.1.19";
+    smallvec = "0.6.10";
+    tokio = "0.1.22";
     trust_dns_proto = "0.6.3";
     ipconfig = "0.1.9";
   };
   deps.try_lock."0.2.2" = {};
   deps.try_from."0.3.2" = {
-    cfg_if = "0.1.7";
+    cfg_if = "0.1.9";
   };
-  deps.ucd_util."0.1.3" = {};
-  deps.unicase."1.4.2" = {
-    version_check = "0.1.5";
-  };
-  deps.unicase."2.4.0" = {
+  deps.unicase."2.5.1" = {
     version_check = "0.1.5";
   };
   deps.unicode_bidi."0.3.4" = {
     matches = "0.1.8";
   };
   deps.unicode_normalization."0.1.8" = {
-    smallvec = "0.6.9";
+    smallvec = "0.6.10";
   };
-  deps.unicode_width."0.1.5" = {};
+  deps.unicode_width."0.1.6" = {};
   deps.unicode_xid."0.1.0" = {};
+  deps.unicode_xid."0.2.0" = {};
   deps.untrusted."0.6.2" = {};
   deps.url."1.7.2" = {
     encoding = "0.2.33";
@@ -1033,56 +1084,63 @@ rec {
     matches = "0.1.8";
     percent_encoding = "1.0.1";
   };
-  deps.utf8_ranges."1.0.2" = {};
+  deps.url."2.1.0" = {
+    idna = "0.2.0";
+    matches = "0.1.8";
+    percent_encoding = "2.1.0";
+  };
   deps.uuid."0.7.4" = {
     rand = "0.6.5";
   };
-  deps.v_escape."0.7.2" = {
-    v_escape_derive = "0.5.3";
-    version_check = "0.1.5";
+  deps.v_escape."0.7.4" = {
+    v_escape_derive = "0.5.5";
   };
-  deps.v_escape_derive."0.5.3" = {
+  deps.v_escape_derive."0.5.5" = {
     nom = "4.2.3";
-    proc_macro2 = "0.4.29";
-    quote = "0.6.12";
-    syn = "0.15.33";
+    proc_macro2 = "0.4.30";
+    quote = "0.6.13";
+    syn = "0.15.44";
   };
-  deps.v_htmlescape."0.4.3" = {
-    cfg_if = "0.1.7";
-    v_escape = "0.7.2";
+  deps.v_htmlescape."0.4.5" = {
+    cfg_if = "0.1.9";
+    v_escape = "0.7.4";
   };
-  deps.vcpkg."0.2.6" = {};
+  deps.vcpkg."0.2.7" = {};
   deps.vec_map."0.8.1" = {};
   deps.version_check."0.1.5" = {};
-  deps.want."0.0.6" = {
-    futures = "0.1.26";
-    log = "0.4.6";
+  deps.want."0.2.0" = {
+    futures = "0.1.29";
+    log = "0.4.8";
     try_lock = "0.2.2";
   };
+  deps.wasi."0.7.0" = {};
   deps.which."1.0.5" = {
-    libc = "0.2.54";
+    libc = "0.2.62";
   };
   deps.widestring."0.2.2" = {};
   deps.winapi."0.2.8" = {};
-  deps.winapi."0.3.7" = {
+  deps.winapi."0.3.8" = {
     winapi_i686_pc_windows_gnu = "0.4.0";
     winapi_x86_64_pc_windows_gnu = "0.4.0";
   };
   deps.winapi_build."0.1.1" = {};
   deps.winapi_i686_pc_windows_gnu."0.4.0" = {};
   deps.winapi_util."0.1.2" = {
-    winapi = "0.3.7";
+    winapi = "0.3.8";
   };
   deps.winapi_x86_64_pc_windows_gnu."0.4.0" = {};
-  deps.wincolor."1.0.1" = {
-    winapi = "0.3.7";
+  deps.wincolor."1.0.2" = {
+    winapi = "0.3.8";
     winapi_util = "0.1.2";
   };
   deps.winreg."0.5.1" = {
-    winapi = "0.3.7";
+    winapi = "0.3.8";
+  };
+  deps.winreg."0.6.2" = {
+    winapi = "0.3.8";
   };
   deps.winutil."0.1.1" = {
-    winapi = "0.3.7";
+    winapi = "0.3.8";
   };
   deps.ws2_32_sys."0.2.1" = {
     winapi = "0.2.8";
