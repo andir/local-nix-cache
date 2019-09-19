@@ -4,7 +4,7 @@ let
 
 in {
   pkg = (pkgs.callPackage ./nix/Cargo.nix {}).rootCrate.build;
-  inherit pkgs;
+  inherit (pkgs) nix;
   shell = pkgs.mkShell {
     nativeBuildInputs = with pkgs; [ crate2nix niv ];
     buildInputs = with pkgs; [
