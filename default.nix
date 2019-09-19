@@ -5,6 +5,7 @@ let
 in {
   pkg = (pkgs.callPackage ./nix/Cargo.nix {}).rootCrate.build;
   inherit (pkgs) nix;
+  path = ./.;
   shell = pkgs.mkShell {
     nativeBuildInputs = with pkgs; [ crate2nix niv ];
     buildInputs = with pkgs; [
