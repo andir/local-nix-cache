@@ -1,8 +1,10 @@
-use std::sync::Arc;
-use crate::state::State as AppState;
 use crate::avahi;
-use actix_web::{middleware, server, App, HttpResponse, Path, Responder, State};
+use crate::state::State as AppState;
+use actix_web::web::{Data as State, Path};
+use actix_web::{middleware, App, Error, HttpResponse, HttpServer, Responder};
+use futures::Future;
 use multicast_dns::host::HostManager as AvahiHostManager;
+use std::sync::Arc;
 
 fn nar(data: State<AppState>, info: Path<(String,)>) -> impl Responder {
     let hash = format!("sha256:{}", info.0);
@@ -85,18 +87,18 @@ fn narinfo(data: State<AppState>, info: Path<(String,)>) -> impl Responder {
                         }
 
                         let resp = narinfo.format_with_compression("none");
-                        return HttpResponse::Ok()
+                        HttpResponse::Ok()
                             .content_type("text/x-nix-narinfo")
-                            .body(resp);
+                            .body(resp)
                     }
                     Err(e) => {
                         println!("Failed to retrieve NARInfo for path {}: {}", path, e);
-                        return HttpResponse::NotFound().finish();
+                        HttpResponse::NotFound().finish()
                     }
                 }
             } else {
                 println!("Path {} is not signed by cache.nixos.org", path);
-                return HttpResponse::NotFound().finish();
+                HttpResponse::NotFound().finish()
             }
         }
     }
@@ -106,31 +108,31 @@ fn nix_cache_info(_state: State<AppState>) -> impl Responder {
     "StoreDir: /nix/store\nWantMassQuery: 1\nPriority: 30\n"
 }
 
+fn avahi_proxy(
+    state: State<AppState>,
+    info: Path<(String,)>,
+) -> impl Future<Item = HttpResponse, Error = Error> {
+    let path = &info.0;
+    println!("Got request for {}", path);
+    let hosts = state.get_avahi().get_hosts();
 
+    let client = reqwest::r#async::ClientBuilder::new()
+        .connect_timeout(std::time::Duration::from_millis(300))
+        .build()
+        .expect("Failed to build client");
+
+    avahi::try_retrieve(client, (*path).to_string(), hosts)
+        .and_then(|r| Ok(HttpResponse::Ok().body(r)))
+        .or_else(|r|
+            HttpResponse::NotFound().finish())
+}
 
 pub fn serve(port: i16) -> std::io::Result<()> {
     let host_manager = AvahiHostManager::new();
-    if let Err(e) = host_manager.announce_service("My local nix cache", "_nixcache._tcp", port as u16) {
+    if let Err(e) =
+        host_manager.announce_service("My local nix cache", "_nixcache._tcp", port as u16)
+    {
         println!("Failed to announce service via avahi. Consider setting `services.avahi.publish.userServices = true;` in your NixOS configuration. Error: {}", e);
-    }
-
-
-
-
-    fn avahi_proxy(state: State<AppState>, info: Path<(String,)>) -> impl Responder {
-        let path = &info.0;
-        println!("Got request for {}", path);
-        let hosts = state.get_avahi().get_hosts();
-
-        let client = reqwest::r#async::ClientBuilder::new().connect_timeout(std::time::Duration::from_millis(300)).build().expect("Failed to build client");
-
-        use futures::future::Future;
-        avahi::try_retrieve(client, *path, hosts).map_err(|e| {
-            println!("Retrieving path {} from avahi discovered hosts failed: {:?}", path, e);
-            HttpResponse::NotFound().finish()
-        }).map(|r| {
-            HttpResponse::Ok().body(r)
-        })
     }
 
     let avahi = Arc::new(avahi::AvahiDiscovery::new());
@@ -139,20 +141,20 @@ pub fn serve(port: i16) -> std::io::Result<()> {
         std::thread::spawn(move || a.run());
     }
 
-    server::new(move || {
-        let d = AppState::new(Arc::clone(&avahi));
-        App::with_state(d)
-            .middleware(middleware::Logger::default())
-            .resource("/nar/{narHash}.nar", |r| r.get().with(nar))
-            .resource("/{narHash}.narinfo", |r| r.get().with(narinfo))
-            .resource("/nix-cache-info", |r| r.get().with(nix_cache_info))
-            .resource("/avahi/nix-cache-info", |r| r.get().with(nix_cache_info))
-            .resource("/avahi/{path}", |r| r.get().with(avahi_proxy))
+    HttpServer::new(move || {
+        use actix_web::web::*;
+        let d = Data::new(AppState::new(Arc::clone(&avahi)));
+        App::new()
+            .register_data(d)
+            .wrap(middleware::Logger::default())
+            .service(resource("/nar/{narHash}.nar").route(get().to(nar)))
+            .service(resource("/{narHash}.narinfo").route(get().to(narinfo)))
+            .service(resource("/nix-cache-info").route(get().to(nix_cache_info)))
+            .service(resource("/avahi/nix-cache-info").route(get().to(nix_cache_info)))
+            .service(resource("/avahi/{path}").route(get().to_async(avahi_proxy)))
     })
     .bind(format!("[::]:{}", port))?
     .run();
 
     Ok(())
 }
-
-

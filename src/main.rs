@@ -1,13 +1,12 @@
-extern crate multicast_dns;
 extern crate libnixstore_sys;
+extern crate multicast_dns;
 
 use futures::future::Future;
 
 mod avahi;
+mod narinfo;
 mod state;
 mod web;
-mod narinfo;
-
 
 fn main() {
     use clap::{App, Arg};

@@ -1,7 +1,7 @@
-use std::collections::HashMap;
-use std::sync::{Arc, RwLock};
 use crate::avahi;
 use crate::narinfo::NARInfo;
+use std::collections::HashMap;
+use std::sync::{Arc, RwLock};
 
 pub struct State {
     narinfo_cache: Arc<RwLock<HashMap<String, NARInfo>>>,
@@ -50,5 +50,3 @@ impl State {
         Ok(narinfo)
     }
 }
-
-

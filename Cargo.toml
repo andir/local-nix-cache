@@ -12,7 +12,9 @@ env_logger = "0.6"
 futures = "0.1.29"                        # An implementation of futures and streams featuring zero allocations, composability, a…
 
 [dependencies.actix-web]
-version = "0.7"
+version = "1.0"
+default-features = false
+features = [ "brotli", "client", "fail", "rust-tls" ]
 
 [dependencies.libnixstore-sys]
 version = "0.1.0"

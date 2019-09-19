@@ -13,16 +13,16 @@
 
 #[derive(Default, Clone, Debug)]
 pub struct NARInfo {
-    store_path: String,
-    url: String,
-    compression: String,
-    file_hash: String,
-    file_size: isize,
-    nar_hash: String,
-    nar_size: isize,
-    references: String,
-    deriver: String,
-    sig: String,
+    pub store_path: String,
+    pub url: String,
+    pub compression: String,
+    pub file_hash: String,
+    pub file_size: isize,
+    pub nar_hash: String,
+    pub nar_size: isize,
+    pub references: String,
+    pub deriver: String,
+    pub sig: String,
 }
 
 impl NARInfo {
@@ -94,5 +94,3 @@ impl NARInfo {
         Ok(ni)
     }
 }
-
-
