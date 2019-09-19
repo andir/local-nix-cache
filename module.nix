@@ -1,7 +1,7 @@
 { lib, config, pkgs, ... }:
 let
   cfg = config.local-nix-cache;
-  drvs = import ./default.nix { pkgsSrc = pkgs.path; };
+  drvs = import ./default.nix { /* pkgsSrc = pkgs.path; */ };
 in
 with lib; {
 
