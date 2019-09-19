@@ -5,10 +5,11 @@ authors = ["Andreas Rammhold <andreas@rammhold.de>"]
 edition = "2018"
 
 [dependencies]
-clap = "2.33.0"
-tempdir = "0.3.7"
-reqwest = "0.9.15"
-env_logger = "0.6.1"
+clap = "2.33"
+tempdir = "0.3"
+reqwest = "0.9"
+env_logger = "0.6"
+futures = "0.1.29"                        # An implementation of futures and streams featuring zero allocations, composability, a…
 
 [dependencies.actix-web]
 version = "0.7"

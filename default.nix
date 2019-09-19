@@ -1,4 +1,4 @@
-{ pkgsSrc ? (import ./pkgs.nix)}:
+{ pkgsSrc ? ./nix}:
 let
   pkgs = import pkgsSrc {};
   libnixstore-c = pkgs.callPackage (pkgs.fetchFromGitHub {
@@ -48,7 +48,7 @@ in {
     inherit crateOverrides;
   };
   shell = pkgs.mkShell {
-    nativeBuildInputs = with pkgs; [ carnix ];
+    nativeBuildInputs = with pkgs; [ carnix niv ];
     buildInputs = with pkgs; [
       sqlite
       openssl

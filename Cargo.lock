@@ -847,6 +847,7 @@ dependencies = [
  "actix-web 0.7.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "env_logger 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "futures 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)",
  "libnixstore-sys 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "multicast_dns 0.4.2 (git+https://github.com/andir/multicast-dns?branch=support-announce)",
  "reqwest 0.9.20 (registry+https://github.com/rust-lang/crates.io-index)",
