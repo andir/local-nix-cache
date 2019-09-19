@@ -3,6 +3,7 @@ use futures::future::Future;
 use multicast_dns::discovery::*;
 use reqwest::r#async::Client;
 use std::sync::{Arc, RwLock};
+use crate::util;
 
 #[derive(Debug)]
 pub enum Error {
@@ -35,6 +36,7 @@ impl AvahiDiscovery {
             let on_service_resolved = |service: ServiceInfo| {
                 let h = Arc::clone(&hosts);
                 let mut hs = h.write().expect("RwLock poisoned");
+                println!("resolved: {:?}", service);
                 hs.push(service);
             };
 
@@ -44,6 +46,7 @@ impl AvahiDiscovery {
                     let resolve_listeners = ResolveListeners {
                         on_service_resolved: Some(&on_service_resolved),
                     };
+                    println!("discovered: {:?}", service);
                     manager.resolve_service(service, resolve_listeners);
                 }
             };
@@ -53,13 +56,15 @@ impl AvahiDiscovery {
                 let hs = h.read().expect("RwLock poisoned");
                 println!("All discovered");
                 let mut sh = self.hosts.write().expect("RwLock poisoned");
-                *sh = hs
+                let v = hs
                     .iter()
                     .filter_map(|h| match (h.address.clone(), h.port) {
                         (Some(a), port) => Some((a, port)),
                         _ => None,
                     })
                     .collect::<Vec<_>>();
+                println!("Discovered: {:?}", v);
+                *sh = v;
             };
 
             let discovery_listeners = DiscoveryListeners {
@@ -79,6 +84,8 @@ impl AvahiDiscovery {
 #[derive(Debug)]
 pub enum AvahiRetrievalError {
     Exhausted,
+    ReqwestError(reqwest::Error),
+    RetrievalError(util::RetrievalError)
 }
 
 pub fn try_retrieve(
@@ -88,13 +95,19 @@ pub fn try_retrieve(
 ) -> Box<dyn Future<Item = String, Error = AvahiRetrievalError>> {
     if let Some(((host, port), hosts)) = hosts.split_first() {
         let hosts = hosts.to_vec();
-        let url = format!("http://{}/{}", host, path);
+        let url = format!("http://{}:{}/{}", host, port, path);
+        println!("trying: {}", url);
+
+
         let chain = client
             .get(&url)
             .send()
-            .and_then(|mut r| r.text())
-            .or_else(|_| try_retrieve(client, path, hosts))
-            .map_err(|e| e.into());
+            .map_err(AvahiRetrievalError::ReqwestError)
+            .and_then(|r| util::text200_or_err(r).map_err(AvahiRetrievalError::RetrievalError))
+            .or_else(|r| {
+                println!("failed to retrieve from host: {:?}", r);
+                try_retrieve(client, path, hosts)
+            });
         Box::new(chain)
     } else {
         Box::new(err(AvahiRetrievalError::Exhausted))
