@@ -24,11 +24,10 @@ with lib; {
       };
     };
     client = {
-      # pretty much useless for now but well someone might want it...
       enable = mkEnableOption "Use the specified 'local' cache in addition to the other substituters that you configured.";
       substituter = mkOption {
-        default = "";
-        types = types.str;
+        default = "http://localhost:${toString cfg.server.port}/avahi/";
+        type = types.str;
         description = ''
           the url of the local substituter to use
         '';
