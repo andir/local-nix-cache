@@ -65,10 +65,20 @@ impl AvahiDiscovery {
         let seen_hosts: RwLock<HashSet<AvahiHost>> = RwLock::new(HashSet::new());
 
         let update_hosts = || {
+            let now = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_millis();
             let seen_hosts = seen_hosts.read().expect("RwLock poisoned");
             let hosts: Vec<_> = seen_hosts
                 .iter()
-                .map(|v| (v.addr.clone(), v.port))
+                .filter_map(|v| {
+                    if now - v.last_seen < 120_000 {
+                        Some((v.addr.clone(), v.port))
+                    } else {
+                        None
+                    }
+                })
                 .collect();
             println!("Hosts: {:?}", hosts);
             let mut hs = self.hosts.write().expect("RwLock poisoned");
@@ -103,6 +113,7 @@ impl AvahiDiscovery {
 
             let on_all_discovered = || {
                 println!("All discovered");
+                manager.stop_service_discovery();
             };
 
             let discovery_listeners = DiscoveryListeners {
@@ -113,6 +124,8 @@ impl AvahiDiscovery {
             manager
                 .discover_services("_nixcache._tcp", discovery_listeners)
                 .unwrap();
+
+            std::thread::sleep(std::time::Duration::from_millis(15_000));
         }
     }
 }
