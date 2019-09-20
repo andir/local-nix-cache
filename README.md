@@ -67,11 +67,32 @@ You can override the local Nix store in `configuration.nix` via:
 }
 ```
 
-# Future work
+# How Can I use it?
 
-Discovering local peers via some kind of local mesh/p2p/multicast discovery is
-pretty important to me. Iterating through all the local "caches" before hitting
-cache.nixos.org.
+```
+{ config, pkgs, lib, ... }:
+let
+  local-nix-cache = import ((import <nixpkgs> {}).fetchFromGitHub {
+    owner = "andir";
+    repo = "local-nix-cache";
+    rev = "2dc22a2bc2d4eedb8918f32aa2aabfbfc955ca8e";
+    sha256 = "13a4qh8fk7dqp227w38j83yflf5vgds1128lqpb8jbyi56ffjnjn";
+  }) {};
+in
+{
+  imports = [
+    (local-nix-cache.path + "/module.nix")
+  ];
+
+  local-nix-cache = {
+    server.enable = true;
+    client.enable = true;
+  };
+  networking.firewall.allowedTCPPorts = [ config.local-nix-cache.server.port ];
+
+  systemd.services.local-nix-cache.path = [ local-nix-cache.nix ];
+}
+```
 
 # Related work
 
