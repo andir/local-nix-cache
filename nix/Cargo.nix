@@ -2134,8 +2134,9 @@ rec {
           "actix-web" = {
             packageId = "actix-web 1.0.7 (registry+https://github.com/rust-lang/crates.io-index)";
             usesDefaultFeatures = false;
-            features = [ "fail" ];
+            features = [ "brotli" "client" "fail" "rust-tls" ];
           };
+          "bytes" = "bytes 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)";
           "clap" = "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)";
           "env_logger" = "env_logger 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)";
           "futures" = "futures 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)";
