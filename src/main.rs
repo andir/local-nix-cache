@@ -10,7 +10,7 @@ mod web;
 fn main() {
     use clap::{App, Arg};
     env_logger::init();
-
+    std::env::set_var("RUST_LOG", "actix_web=info");
     let matches = App::new("Nix-Local-Cache-Serve-Narinfo")
                      .version("1.0")
                      .author("Andreas Rammhold <andreas@rammhold.de>")

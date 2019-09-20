@@ -2,12 +2,46 @@ use crate::util;
 use futures::future::{err, Future};
 use multicast_dns::discovery::*;
 use reqwest::r#async::{Client, Response};
+use std::collections::HashSet;
+use std::hash::{Hash, Hasher};
 use std::sync::{Arc, RwLock};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Debug)]
 pub enum Error {
     LockError,
 }
+
+struct AvahiHost {
+    addr: String,
+    port: u16,
+    last_seen: u128,
+}
+
+impl AvahiHost {
+    fn new(addr: String, port: u16) -> AvahiHost {
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+        AvahiHost {
+            addr,
+            port,
+            last_seen: now.as_millis(),
+        }
+    }
+}
+
+impl Hash for AvahiHost {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.addr.hash(state);
+        self.port.hash(state);
+    }
+}
+
+impl std::cmp::PartialEq for AvahiHost {
+    fn eq(&self, other: &Self) -> bool {
+        self.addr == other.addr && self.port == other.port
+    }
+}
+impl std::cmp::Eq for AvahiHost {}
 
 #[derive(Debug)]
 pub struct AvahiDiscovery {
@@ -28,15 +62,32 @@ impl AvahiDiscovery {
 
     pub fn run(&self) {
         let manager = Arc::new(DiscoveryManager::new());
+        let seen_hosts: RwLock<HashSet<AvahiHost>> = RwLock::new(HashSet::new());
+
+        let update_hosts = || {
+            let seen_hosts = seen_hosts.read().expect("RwLock poisoned");
+            let hosts: Vec<_> = seen_hosts
+                .iter()
+                .map(|v| (v.addr.clone(), v.port))
+                .collect();
+            println!("Hosts: {:?}", hosts);
+            let mut hs = self.hosts.write().expect("RwLock poisoned");
+            *hs = hosts;
+        };
+
         loop {
             println!("Searching for avahi nixcaches");
-            let hosts = Arc::new(RwLock::new(vec![]));
-
             let on_service_resolved = |service: ServiceInfo| {
-                let h = Arc::clone(&hosts);
-                let mut hs = h.write().expect("RwLock poisoned");
                 println!("resolved: {:?}", service);
-                hs.push(service);
+                if let Some(a) = service.address.clone() {
+                    {
+                        let mut seen_hosts = seen_hosts.write().expect("RwLock poisoned");
+                        let host = AvahiHost::new(a, service.port);
+                        seen_hosts.replace(host);
+                    }
+
+                    update_hosts();
+                }
             };
 
             let on_service_discovered = {
@@ -51,19 +102,7 @@ impl AvahiDiscovery {
             };
 
             let on_all_discovered = || {
-                let h = Arc::clone(&hosts);
-                let hs = h.read().expect("RwLock poisoned");
                 println!("All discovered");
-                let mut sh = self.hosts.write().expect("RwLock poisoned");
-                let v = hs
-                    .iter()
-                    .filter_map(|h| match (h.address.clone(), h.port) {
-                        (Some(a), port) => Some((a, port)),
-                        _ => None,
-                    })
-                    .collect::<Vec<_>>();
-                println!("Discovered: {:?}", v);
-                *sh = v;
             };
 
             let discovery_listeners = DiscoveryListeners {
@@ -74,8 +113,6 @@ impl AvahiDiscovery {
             manager
                 .discover_services("_nixcache._tcp", discovery_listeners)
                 .unwrap();
-
-            std::thread::sleep(std::time::Duration::from_millis(10000));
         }
     }
 }
