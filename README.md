@@ -91,6 +91,11 @@ in
   networking.firewall.allowedTCPPorts = [ config.local-nix-cache.server.port ];
 
   systemd.services.local-nix-cache.path = [ local-nix-cache.nix ];
+
+  services.avahi.enable = true;
+  services.avahi.publish.enable = true;
+  services.avahi.publish.userServices = true;
+
 }
 ```
 
