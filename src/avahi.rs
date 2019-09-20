@@ -1,9 +1,8 @@
-use futures::future::err;
-use futures::future::Future;
-use multicast_dns::discovery::*;
-use reqwest::r#async::Client;
-use std::sync::{Arc, RwLock};
 use crate::util;
+use futures::future::{err, Future};
+use multicast_dns::discovery::*;
+use reqwest::r#async::{Client, Response};
+use std::sync::{Arc, RwLock};
 
 #[derive(Debug)]
 pub enum Error {
@@ -85,25 +84,28 @@ impl AvahiDiscovery {
 pub enum AvahiRetrievalError {
     Exhausted,
     ReqwestError(reqwest::Error),
-    RetrievalError(util::RetrievalError)
+    RetrievalError(util::RetrievalError),
 }
 
 pub fn try_retrieve(
     client: Client,
     path: String,
     hosts: Vec<(String, u16)>,
-) -> Box<dyn Future<Item = String, Error = AvahiRetrievalError>> {
+) -> Box<dyn Future<Item = (util::SmallHeader, Response), Error = AvahiRetrievalError>> {
     if let Some(((host, port), hosts)) = hosts.split_first() {
         let hosts = hosts.to_vec();
         let url = format!("http://{}:{}/{}", host, port, path);
         println!("trying: {}", url);
 
-
         let chain = client
             .get(&url)
             .send()
             .map_err(AvahiRetrievalError::ReqwestError)
-            .and_then(|r| util::text200_or_err(r).map_err(AvahiRetrievalError::RetrievalError))
+            .and_then(|r| util::stream200_or_err(r).map_err(AvahiRetrievalError::RetrievalError))
+            .map(|(sh, r)| {
+                println!("sh: {:?}", sh);
+                (sh, r)
+            })
             .or_else(|r| {
                 println!("failed to retrieve from host: {:?}", r);
                 try_retrieve(client, path, hosts)

@@ -10,6 +10,7 @@ tempdir = "0.3"
 reqwest = "0.9"
 env_logger = "0.6"
 futures = "0.1.29"                        # An implementation of futures and streams featuring zero allocations, composability, a…
+bytes = "0.4"
 
 [dependencies.actix-web]
 version = "1.0"

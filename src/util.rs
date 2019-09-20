@@ -1,4 +1,5 @@
-use futures::future::{err, Future};
+use futures::future::{err, ok, Future};
+use reqwest::r#async::Response;
 #[derive(Debug)]
 pub enum RetrievalError {
     Exhausted,
@@ -6,10 +7,30 @@ pub enum RetrievalError {
     ReqwestError(reqwest::Error),
 }
 
-pub fn text200_or_err(mut r: reqwest::r#async::Response) -> Box<dyn Future<Item=String, Error= RetrievalError>> {
+#[derive(Debug)]
+pub struct SmallHeader {
+    pub content_type: Option<String>,
+    pub content_length: Option<u64>,
+}
+
+pub fn stream200_or_err(
+    mut r: reqwest::r#async::Response,
+) -> Box<dyn Future<Item = (SmallHeader, Response), Error = RetrievalError>> {
+    let content_type: Option<_> = match r
+        .headers()
+        .get(reqwest::header::CONTENT_TYPE)
+        .map(|v| v.to_str())
+    {
+        Some(Ok(v)) => Some(v.to_string()),
+        _ => None,
+    };
+    let content_length = r.content_length();
+    let sh = SmallHeader {
+        content_type,
+        content_length,
+    };
     if r.status().as_u16() == 200 {
-        use futures::future::IntoFuture;
-        Box::new(r.text().map_err(RetrievalError::ReqwestError).into_future())
+        Box::new(ok((sh, r)))
     } else {
         Box::new(err(RetrievalError::Not200))
     }

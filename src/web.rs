@@ -3,7 +3,9 @@ use crate::narinfo::NARInfo;
 use crate::state::State as AppState;
 use actix_web::web::{Data as State, Path};
 use actix_web::{middleware, App, Error, HttpResponse, HttpServer, Responder};
+use bytes::buf::Buf;
 use futures::future::{ok, Future};
+use futures::stream::Stream;
 use multicast_dns::host::HostManager as AvahiHostManager;
 use std::sync::Arc;
 
@@ -40,12 +42,15 @@ fn nar(data: State<AppState>, info: Path<(String,)>) -> impl Responder {
         .output()
         .expect("failed to execute dump");
 
-    return HttpResponse::Ok()
+    HttpResponse::Ok()
         .content_type("application/x-nix-nar")
-        .body(out.stdout);
+        .body(out.stdout)
 }
 
-fn narinfo(data: State<AppState>, info: Path<(String,)>) -> Box<dyn Future<Item=HttpResponse, Error=Error>> {
+fn narinfo(
+    data: State<AppState>,
+    info: Path<(String,)>,
+) -> Box<dyn Future<Item = HttpResponse, Error = Error>> {
     //let bdb = data.open_binary_cache_db();
     //let sdb = data.open_store_db();
     let mut instance = libnixstore_sys::Instance::new().unwrap();
@@ -76,29 +81,28 @@ fn narinfo(data: State<AppState>, info: Path<(String,)>) -> Box<dyn Future<Item=
             // very ugly way to deal with this.. If the local Nar cache would always be
             // there we could look it up there :/
             if !sigs.is_empty() && sigs.starts_with("cache.nixos.org-1:") {
-                let fut = data.retrieve_narinfo(&info.0)
-                    .then(move |r: Result<NARInfo, _>| {
-                        match r {
+                let fut =
+                    data.retrieve_narinfo(&info.0)
+                        .then(move |r: Result<NARInfo, _>| match r {
                             Ok(narinfo) => {
-                            match instance.query_path_from_file_hash(&narinfo.file_hash) {
-                                Ok(None) | Err(_) => {
-                                    println!("Path {} not cached locally", &path_info.path);
-                                    return HttpResponse::NotFound().finish()
+                                match instance.query_path_from_file_hash(&narinfo.file_hash) {
+                                    Ok(None) | Err(_) => {
+                                        println!("Path {} not cached locally", &path_info.path);
+                                        return HttpResponse::NotFound().finish();
+                                    }
+                                    Ok(Some(_)) => {}
                                 }
-                                Ok(Some(_)) => {}
-                            }
 
-                            let resp = narinfo.format_with_compression("none");
-                            HttpResponse::Ok()
-                                .content_type("text/x-nix-narinfo")
-                                .body(resp)
-                        },
-                        Err(e) => {
-                            println!("Failed to retrieve NARInfo for path {}: {:?}", path, e);
-                            HttpResponse::NotFound().finish()
-                        }
-                    }
-                });
+                                let resp = narinfo.format_with_compression("none");
+                                HttpResponse::Ok()
+                                    .content_type("text/x-nix-narinfo")
+                                    .body(resp)
+                            }
+                            Err(e) => {
+                                println!("Failed to retrieve NARInfo for path {}: {:?}", path, e);
+                                HttpResponse::NotFound().finish()
+                            }
+                        });
                 Box::new(fut)
             } else {
                 println!("Path {} is not signed by cache.nixos.org", path);
@@ -126,10 +130,21 @@ fn avahi_proxy(
         .expect("Failed to build client");
 
     avahi::try_retrieve(client, (*path).to_string(), hosts)
-        .and_then(|r| Ok(HttpResponse::Ok().body(r)))
+        .and_then(|(sh, r)| {
+            let stream = r
+                .into_body()
+                .map_err(actix_web::error::ErrorInternalServerError)
+                .map(|chunk| -> bytes::Bytes { bytes::Bytes::from(chunk.bytes()) });
+            let response = match sh.content_type {
+                Some(ct) => HttpResponse::Ok().content_type(ct).streaming(stream),
+                None => HttpResponse::Ok().streaming(stream),
+            };
+            Ok(response)
+        })
         .or_else(|r| {
             println!("or else: {:?}", r);
-            HttpResponse::NotFound().finish()})
+            HttpResponse::NotFound().finish()
+        })
 }
 
 pub fn serve(port: i16) -> std::io::Result<()> {
@@ -156,7 +171,7 @@ pub fn serve(port: i16) -> std::io::Result<()> {
             .service(resource("/{narHash}.narinfo").route(get().to(narinfo)))
             .service(resource("/nix-cache-info").route(get().to(nix_cache_info)))
             .service(resource("/avahi/nix-cache-info").route(get().to(nix_cache_info)))
-            .service(resource("/avahi/{path}").route(get().to_async(avahi_proxy)))
+            .service(resource("/avahi/{path:.*}").route(get().to_async(avahi_proxy)))
     })
     .bind(format!("[::]:{}", port))?
     .run()?;

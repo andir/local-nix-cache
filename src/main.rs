@@ -4,8 +4,8 @@ extern crate multicast_dns;
 mod avahi;
 mod narinfo;
 mod state;
-mod web;
 mod util;
+mod web;
 
 fn main() {
     use clap::{App, Arg};
