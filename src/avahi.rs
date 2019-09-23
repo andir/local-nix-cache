@@ -86,7 +86,11 @@ impl AvahiDiscovery {
         };
 
         loop {
+
+            let wg = util::WaitGroup::new_arc();
+
             println!("Searching for avahi nixcaches");
+            let wg_done = wg.clone();
             let on_service_resolved = |service: ServiceInfo| {
                 println!("resolved: {:?}", service);
                 if let Some(a) = service.address.clone() {
@@ -97,9 +101,11 @@ impl AvahiDiscovery {
                     }
 
                     update_hosts();
+                    wg_done.decrement();
                 }
             };
 
+            let wg_new = wg.clone();
             let on_service_discovered = {
                 let manager = manager.clone();
                 move |service: ServiceInfo| {
@@ -108,6 +114,7 @@ impl AvahiDiscovery {
                     };
                     println!("discovered: {:?}", service);
                     manager.resolve_service(service, resolve_listeners);
+                    wg_new.increment();
                 }
             };
 
@@ -125,7 +132,12 @@ impl AvahiDiscovery {
                 .discover_services("_nixcache._tcp", discovery_listeners)
                 .unwrap();
 
-            std::thread::sleep(std::time::Duration::from_millis(15_000));
+            println!("Waiting for all tasks to finish");
+            wg.wait();
+
+            let duration = std::time::Duration::from_millis(15_000);
+            println!("Sleeping for {:?}", duration);
+            std::thread::sleep(duration);
         }
     }
 }

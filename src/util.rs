@@ -1,5 +1,7 @@
 use futures::future::{err, ok, Future};
 use reqwest::r#async::Response;
+use std::sync::{Arc, Condvar, Mutex};
+
 #[derive(Debug)]
 pub enum RetrievalError {
     Exhausted,
@@ -33,5 +35,43 @@ pub fn stream200_or_err(
         Box::new(ok((sh, r)))
     } else {
         Box::new(err(RetrievalError::Not200))
+    }
+}
+
+
+#[derive(Debug)]
+pub struct WaitGroup {
+   counter: Mutex<i64>,
+   condvar: Condvar,
+}
+
+impl WaitGroup {
+    pub fn new() -> Self {
+        WaitGroup {
+            counter: Mutex::new(0),
+            condvar: Condvar::new(),
+        }
+    }
+
+    pub fn new_arc() -> Arc<Self> {
+        Arc::new(Self::new())
+    }
+
+    pub fn increment(&self) {
+        let mut c = self.counter.lock().unwrap();
+        *c += 1;
+    }
+
+    pub fn decrement(&self) {
+        let mut c = self.counter.lock().unwrap();
+        *c -= 1;
+        self.condvar.notify_all();
+    }
+
+    pub fn wait(&self) {
+        let mut count = self.counter.lock().unwrap();
+        while *count > 0 {
+            count = self.condvar.wait(count).unwrap();
+        }
     }
 }
