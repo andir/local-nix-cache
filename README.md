@@ -69,14 +69,14 @@ You can override the local Nix store in `configuration.nix` via:
 
 # How Can I use it?
 
-```
+```nix
 { config, pkgs, lib, ... }:
 let
   local-nix-cache = import ((import <nixpkgs> {}).fetchFromGitHub {
     owner = "andir";
     repo = "local-nix-cache";
-    rev = "2dc22a2bc2d4eedb8918f32aa2aabfbfc955ca8e";
-    sha256 = "13a4qh8fk7dqp227w38j83yflf5vgds1128lqpb8jbyi56ffjnjn";
+    rev = "be2d3ea9d8da586647540c164805730d2d34a556";
+    sha256 = "1fdj2b7bz0gxdbbdc29x46ivlj8fkvg08w6jiya9xwqkr6gpv2ai";
   }) {};
 in
 {
