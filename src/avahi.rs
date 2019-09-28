@@ -61,7 +61,6 @@ impl AvahiDiscovery {
     }
 
     pub fn run(&self) {
-        let manager = Arc::new(DiscoveryManager::new());
         let seen_hosts: RwLock<HashSet<AvahiHost>> = RwLock::new(HashSet::new());
 
         let update_hosts = || {
@@ -86,6 +85,7 @@ impl AvahiDiscovery {
         };
 
         loop {
+            let manager = Arc::new(DiscoveryManager::new());
 
             let wg = util::WaitGroup::new_arc();
 
@@ -101,7 +101,6 @@ impl AvahiDiscovery {
                     }
 
                     update_hosts();
-                    wg_done.decrement();
                 }
             };
 
@@ -113,8 +112,9 @@ impl AvahiDiscovery {
                         on_service_resolved: Some(&on_service_resolved),
                     };
                     println!("discovered: {:?}", service);
-                    manager.resolve_service(service, resolve_listeners);
                     wg_new.increment();
+                    manager.resolve_service(service, resolve_listeners);
+                    wg_done.decrement();
                 }
             };
 
@@ -134,6 +134,8 @@ impl AvahiDiscovery {
 
             println!("Waiting for all tasks to finish");
             wg.wait();
+
+            drop(manager);
 
             let duration = std::time::Duration::from_millis(15_000);
             println!("Sleeping for {:?}", duration);
