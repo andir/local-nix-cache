@@ -584,7 +584,7 @@ rec {
         ];
         dependencies = {
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             usesDefaultFeatures = false;
             target = target."unix";
           };
@@ -665,7 +665,7 @@ rec {
           };
           "cfg-if" = "cfg-if 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)";
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             usesDefaultFeatures = false;
           };
           "rustc-demangle" = "rustc-demangle 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)";
@@ -692,7 +692,7 @@ rec {
         ];
         dependencies = {
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             usesDefaultFeatures = false;
           };
         };
@@ -792,7 +792,7 @@ rec {
           "Alex Crichton <alex@alexcrichton.com>"
         ];
         dependencies = {
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
         };
         buildDependencies = {
           "cc" = "cc 1.0.45 (registry+https://github.com/rust-lang/crates.io-index)";
@@ -811,7 +811,7 @@ rec {
         ];
         dependencies = {
           "brotli-sys" = "brotli-sys 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)";
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
         };
         features = {
         };
@@ -937,7 +937,7 @@ rec {
         ];
         dependencies = {
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             usesDefaultFeatures = false;
           };
           "num-integer" = {
@@ -972,7 +972,7 @@ rec {
         dependencies = {
           "glob" = "glob 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)";
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             usesDefaultFeatures = false;
           };
           "libloading" = {
@@ -1138,7 +1138,7 @@ rec {
         ];
         dependencies = {
           "core-foundation-sys" = "core-foundation-sys 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)";
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
         };
         features = {
           "mac_os_10_7_support" = [ "core-foundation-sys/mac_os_10_7_support" ];
@@ -1501,14 +1501,14 @@ rec {
         ];
         dependencies = {
           "crc32fast" = "crc32fast 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)";
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
           "miniz-sys" = {
             packageId = "miniz-sys 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)";
             optional = true;
           };
           "miniz_oxide" = {
             packageId = "miniz_oxide 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)";
-            #target = ((target."arch" == "wasm32") && (!(target."os" == "emscripten")));
+            target = ((target."arch" == "wasm32") && (!(target."os" == "emscripten")));
           };
         };
         features = {
@@ -1648,7 +1648,7 @@ rec {
         dependencies = {
           "cfg-if" = "cfg-if 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)";
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             usesDefaultFeatures = false;
             target = (target."unix" || (target."os" == "redox"));
           };
@@ -1723,7 +1723,7 @@ rec {
         ];
         dependencies = {
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             target = (target."unix" || (target."os" == "redox"));
           };
           "winutil" = {
@@ -1949,7 +1949,7 @@ rec {
         ];
         dependencies = {
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             target = target."unix";
           };
           "winapi" = {
@@ -2049,12 +2049,12 @@ rec {
           "spin_no_std" = [ "spin" ];
         };
       };
-    "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)"
+    "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)"
       = rec {
         crateName = "libc";
-        version = "0.2.62";
+        version = "0.2.79";
         edition = "2015";
-        sha256 = "1vsb4pyn6gl6sri6cv5hin5wjfgk7lk2bshzmxb1xnkckjhz4gbx";
+        sha256 = "1wm3nx39z9sgc5hf35q1lljrymii7b7c5qikfxlv0ag8c8b0q1ip";
         authors = [
           "The Rust Project Developers"
         ];
@@ -2121,7 +2121,7 @@ rec {
           "serde_impl" = [ "serde" "serde_test" ];
         };
       };
-    "local-nix-cache 0.1.0 (path+file:///home/andi/dev/private/local-nix-cache)"
+    "local-nix-cache 0.1.0 (path+file:///home/joerg/git/local-nix-cache)"
       = rec {
         crateName = "local-nix-cache";
         version = "0.1.0";
@@ -2141,7 +2141,7 @@ rec {
           "env_logger" = "env_logger 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)";
           "futures" = "futures 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)";
           "libnixstore-sys" = "libnixstore-sys 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)";
-          "multicast_dns" = "multicast_dns 0.4.2 (git+https://github.com/andir/multicast-dns?branch=support-announce#55d5ade735641a46ee4ce749698a35a6f29cd093)";
+          "multicast_dns" = "multicast_dns 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)";
           "reqwest" = "reqwest 0.9.20 (registry+https://github.com/rust-lang/crates.io-index)";
           "tempdir" = "tempdir 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)";
         };
@@ -2310,7 +2310,7 @@ rec {
           "Alex Crichton <alex@alexcrichton.com>"
         ];
         dependencies = {
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
         };
         buildDependencies = {
           "cc" = "cc 1.0.45 (registry+https://github.com/rust-lang/crates.io-index)";
@@ -2358,7 +2358,7 @@ rec {
             target = target."windows";
           };
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             target = target."unix";
           };
           "log" = "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)";
@@ -2393,7 +2393,7 @@ rec {
             target = target."unix";
           };
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             target = target."unix";
           };
           "mio" = {
@@ -2425,20 +2425,17 @@ rec {
         features = {
         };
       };
-    "multicast_dns 0.4.2 (git+https://github.com/andir/multicast-dns?branch=support-announce#55d5ade735641a46ee4ce749698a35a6f29cd093)"
+    "multicast_dns 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)"
       = rec {
         crateName = "multicast_dns";
-        version = "0.4.2";
+        version = "0.5.0";
         edition = "2015";
-        src = builtins.fetchGit {
-          url = "https://github.com/andir/multicast-dns";
-          rev = "55d5ade735641a46ee4ce749698a35a6f29cd093";
-        };
+        sha256 = "10i8p3m2nfvga6cqc9yx62ji1yxn4jnr6pszdn9xl5dzf8l44q9g";
         authors = [
           "Aleh Zasypkin <aleh.zasypkin@gmail.com>"
         ];
         dependencies = {
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
           "log" = "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)";
         };
         features = {
@@ -2459,7 +2456,7 @@ rec {
             target = ((target."os" == "macos") || (target."os" == "ios"));
           };
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             target = ((target."os" == "macos") || (target."os" == "ios"));
           };
           "log" = {
@@ -2511,7 +2508,7 @@ rec {
         dependencies = {
           "cfg-if" = "cfg-if 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)";
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             target = ((target."os" == "redox") || target."unix");
           };
           "winapi" = {
@@ -2616,7 +2613,7 @@ rec {
           "Sean McArthur <sean@seanmonstar.com>"
         ];
         dependencies = {
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
         };
         features = {
         };
@@ -2635,7 +2632,7 @@ rec {
           "cfg-if" = "cfg-if 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)";
           "foreign-types" = "foreign-types 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)";
           "lazy_static" = "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)";
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
           "openssl-sys" = "openssl-sys 0.9.49 (registry+https://github.com/rust-lang/crates.io-index)";
         };
         features = {
@@ -2666,7 +2663,7 @@ rec {
           "Steven Fackler <sfackler@gmail.com>"
         ];
         dependencies = {
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
         };
         buildDependencies = {
           "autocfg" = "autocfg 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)";
@@ -2752,7 +2749,7 @@ rec {
         ];
         dependencies = {
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             target = target."unix";
           };
           "rand" = "rand 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)";
@@ -2786,7 +2783,7 @@ rec {
             target = (target."os" == "cloudabi");
           };
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             target = target."unix";
           };
           "redox_syscall" = {
@@ -3034,7 +3031,7 @@ rec {
             target = (target."os" == "fuchsia");
           };
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             optional = true;
             target = target."unix";
           };
@@ -3072,7 +3069,7 @@ rec {
         ];
         dependencies = {
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             usesDefaultFeatures = false;
             target = target."unix";
           };
@@ -3125,7 +3122,7 @@ rec {
             optional = true;
           };
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             usesDefaultFeatures = false;
             target = target."unix";
           };
@@ -3322,7 +3319,7 @@ rec {
         ];
         dependencies = {
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             usesDefaultFeatures = false;
             target = ((target."os" == "macos") || (target."os" == "ios"));
           };
@@ -3357,7 +3354,7 @@ rec {
             target = (target."os" == "fuchsia");
           };
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             target = target."unix";
           };
           "rand_core" = {
@@ -3632,7 +3629,7 @@ rec {
             target = ((target."os" == "redox") || (target."unix" && (!((target."os" == "macos") || (target."os" == "ios")))));
           };
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             usesDefaultFeatures = false;
           };
           "spin" = {
@@ -3796,7 +3793,7 @@ rec {
         dependencies = {
           "core-foundation" = "core-foundation 0.6.4 (registry+https://github.com/rust-lang/crates.io-index)";
           "core-foundation-sys" = "core-foundation-sys 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)";
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
           "security-framework-sys" = "security-framework-sys 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)";
         };
         features = {
@@ -3980,7 +3977,7 @@ rec {
           "Michal 'vorner' Vaner <vorner@vorner.cz>"
         ];
         dependencies = {
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
           "signal-hook-registry" = "signal-hook-registry 1.1.1 (registry+https://github.com/rust-lang/crates.io-index)";
         };
         features = {
@@ -4000,7 +3997,7 @@ rec {
         ];
         dependencies = {
           "arc-swap" = "arc-swap 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)";
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
         };
         features = {
         };
@@ -4047,7 +4044,7 @@ rec {
             target = (target."unix" || (target."os" == "redox"));
           };
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             target = (target."unix" || (target."os" == "redox"));
           };
           "redox_syscall" = {
@@ -4230,7 +4227,7 @@ rec {
         dependencies = {
           "cfg-if" = "cfg-if 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)";
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             target = target."unix";
           };
           "rand" = "rand 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)";
@@ -4323,7 +4320,7 @@ rec {
           "The Rust Project Developers"
         ];
         dependencies = {
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
           "redox_syscall" = {
             packageId = "redox_syscall 0.1.56 (registry+https://github.com/rust-lang/crates.io-index)";
             target = (target."os" == "redox");
@@ -4560,7 +4557,7 @@ rec {
         dependencies = {
           "futures" = "futures 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)";
           "libc" = {
-            packageId = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+            packageId = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
             target = target."unix";
           };
           "mio" = "mio 0.6.19 (registry+https://github.com/rust-lang/crates.io-index)";
@@ -5100,7 +5097,7 @@ rec {
           "fangyuanziti <tiziyuanfang@gmail.com>"
         ];
         dependencies = {
-          "libc" = "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)";
+          "libc" = "libc 0.2.79 (registry+https://github.com/rust-lang/crates.io-index)";
         };
         features = {
         };

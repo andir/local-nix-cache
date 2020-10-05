@@ -11,6 +11,7 @@ reqwest = "0.9"
 env_logger = "0.6"
 futures = "0.1.29"                        # An implementation of futures and streams featuring zero allocations, composability, a…
 bytes = "0.4"
+multicast_dns = "0.5.0"
 
 [dependencies.actix-web]
 version = "1.0"
@@ -20,8 +21,3 @@ features = [ "brotli", "client", "fail", "rust-tls" ]
 [dependencies.libnixstore-sys]
 version = "0.1.0"
 # path = "../libnixstore-sys"
-
-[dependencies.multicast_dns]
-version = "0.4.2"
-git = "https://github.com/andir/multicast-dns"
-branch = "support-announce"
