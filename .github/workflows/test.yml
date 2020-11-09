@@ -9,7 +9,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: cachix/install-nix-action@v12
     - name: Setup cachix
-      uses: cachix/cachix-action@v6
+      uses: cachix/cachix-action@v7
       with:
         name: local-nix-cache
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
